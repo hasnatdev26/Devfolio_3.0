@@ -8,7 +8,6 @@ const footerNavItems = [
   { label: "Projects", href: "/projects" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
-  { label: "Dashboard", href: "/dashboard" },
 ] as const;
 
 export default function FooterQuickLinks() {
