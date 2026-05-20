@@ -13,8 +13,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, message: "Image file is required." }, { status: 400 });
     }
 
-    if (!file.type.startsWith("image/")) {
-      return NextResponse.json({ ok: false, message: "Only image files are allowed." }, { status: 400 });
+    const allowedMimeTypes = new Set(["image/jpeg", "image/jpg", "image/png"]);
+    if (!allowedMimeTypes.has(file.type)) {
+      return NextResponse.json({ ok: false, message: "Only JPG and PNG images are allowed." }, { status: 400 });
     }
 
     const bytes = await file.arrayBuffer();

@@ -27,6 +27,10 @@ export default function DashboardProfilePage() {
 
   const onUpload = async (file: File | null, target: "coverImage" | "profileImage") => {
     if (!file) return;
+    if (!["image/jpeg", "image/jpg", "image/png"].includes(file.type)) {
+      setMessage("Only JPG and PNG images are allowed.");
+      return;
+    }
     if (target === "profileImage") setUploadingProfile(true);
     setMessage("");
     try {
@@ -84,7 +88,7 @@ export default function DashboardProfilePage() {
           <label className="text-sm font-semibold text-slate-700">Upload Profile Photo</label>
           <input
             type="file"
-            accept="image/*"
+            accept=".jpg,.jpeg,.png,image/jpeg,image/png"
             onChange={(e) => onUpload(e.target.files?.[0] || null, "profileImage")}
             disabled={uploadingProfile}
             className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-medium hover:file:bg-slate-200"

@@ -832,23 +832,6 @@ export default function Home() {
               </button>
             </div>
 
-            <form onSubmit={handleLiveChatSubmit} className="space-y-3">
-              <textarea
-                rows={4}
-                value={chatMessage}
-                onChange={(e) => setChatMessage(e.target.value)}
-                placeholder="Write your message..."
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 outline-none focus:border-sky-500"
-                required
-              />
-              <button
-                type="submit"
-                disabled={isChatSubmitting}
-                className="inline-flex w-full items-center justify-center rounded-md bg-sky-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                {isChatSubmitting ? "Sending..." : "Send Message"}
-              </button>
-            </form>
             <div className="mt-4 rounded-md border border-slate-200 bg-slate-50 p-3">
               <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Conversation</p>
               <div ref={chatScrollRef} className="max-h-52 space-y-2 overflow-y-auto pr-1">
@@ -897,6 +880,23 @@ export default function Home() {
                 )}
               </div>
             </div>
+            <form onSubmit={handleLiveChatSubmit} className="mt-4 space-y-3">
+              <textarea
+                rows={4}
+                value={chatMessage}
+                onChange={(e) => setChatMessage(e.target.value)}
+                placeholder="Write your message..."
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 outline-none focus:border-sky-500"
+                required
+              />
+              <button
+                type="submit"
+                disabled={isChatSubmitting}
+                className="inline-flex w-full items-center justify-center rounded-md bg-sky-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {isChatSubmitting ? "Sending..." : "Send Message"}
+              </button>
+            </form>
             {chatStatus ? <p className="mt-3 text-sm text-slate-700">{chatStatus}</p> : null}
           </div>
         </div>

@@ -263,7 +263,7 @@ export default function DashboardMessagesPage() {
             </div>
           </aside>
 
-          <section className="rounded-xl border border-slate-200 bg-white p-4">
+          <section className="flex min-h-[640px] flex-col rounded-xl border border-slate-200 bg-white p-4">
             {activeThread ? (
               <>
                 <div className="mb-3 border-b border-slate-200 pb-3">
@@ -271,7 +271,7 @@ export default function DashboardMessagesPage() {
                   <p className="text-sm text-slate-600">{activeThread.subtitle}</p>
                 </div>
 
-                <div className="mb-4 max-h-[420px] space-y-3 overflow-y-auto pr-1">
+                <div className="mb-4 flex-1 space-y-3 overflow-y-auto pr-1">
                   {activeThread.messages.map((item) => (
                     <div key={item._id} className="space-y-1">
                       {item.sender === "admin" ? (
@@ -313,7 +313,7 @@ export default function DashboardMessagesPage() {
                   ))}
                 </div>
 
-                <div className="space-y-2 border-t border-slate-200 pt-3">
+                <div className="mt-auto space-y-2 border-t border-slate-200 pt-3">
                   <label className="block text-sm font-medium text-slate-700">Reply</label>
                   <textarea
                     rows={3}
