@@ -1,0 +1,198 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #ffffff;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-poppins);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-poppins), sans-serif;
+  overflow-x: hidden;
+}
+
+@keyframes floatText {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-float-text {
+  animation: floatText 2.4s ease-in-out infinite;
+}
+
+@keyframes heroTyping {
+  0%,
+  10% {
+    width: 0;
+  }
+  45%,
+  70% {
+    width: 20ch;
+  }
+  100% {
+    width: 0;
+  }
+}
+
+@keyframes heroCursorBlink {
+  0%,
+  49% {
+    border-color: rgba(255, 255, 255, 0.95);
+  }
+  50%,
+  100% {
+    border-color: transparent;
+  }
+}
+
+.typewriter-text {
+  display: block;
+  width: 20ch;
+  max-width: 20ch;
+  overflow: hidden;
+  white-space: nowrap;
+  line-height: 1.2;
+  vertical-align: top;
+  border-right: 2px solid rgba(255, 255, 255, 0.95);
+  animation: heroTyping 8s steps(20, end) infinite, heroCursorBlink 1s step-end infinite;
+}
+
+@media (max-width: 640px) {
+  .typewriter-text {
+    width: 100%;
+    max-width: 100%;
+    white-space: normal;
+    border-right: 0;
+    animation: none;
+  }
+}
+
+@keyframes bannerBgMove {
+  0% {
+    background-position: 50% 50%;
+  }
+  50% {
+    background-position: 55% 45%;
+  }
+  100% {
+    background-position: 50% 50%;
+  }
+}
+
+@keyframes bannerImageZoom {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-banner-bg {
+  animation: bannerBgMove 16s ease-in-out infinite;
+  background-size: 110%;
+}
+
+.animate-banner-image {
+  animation: bannerImageZoom 14s ease-in-out infinite;
+  transform-origin: center;
+  will-change: transform;
+}
+
+@keyframes bubbleRise {
+  0% {
+    transform: translateY(35px) scale(0.7);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.35;
+  }
+  100% {
+    transform: translateY(-220px) scale(1.1);
+    opacity: 0;
+  }
+}
+
+.bubble-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bubble {
+  position: absolute;
+  bottom: -30px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  animation: bubbleRise linear infinite;
+}
+
+.bubble:nth-child(1) { left: 7%; width: 10px; height: 10px; animation-duration: 9s; animation-delay: 0s; }
+.bubble:nth-child(2) { left: 18%; width: 14px; height: 14px; animation-duration: 11s; animation-delay: 1.2s; }
+.bubble:nth-child(3) { left: 30%; width: 8px; height: 8px; animation-duration: 8.5s; animation-delay: 2.1s; }
+.bubble:nth-child(4) { left: 44%; width: 16px; height: 16px; animation-duration: 12s; animation-delay: 0.8s; }
+.bubble:nth-child(5) { left: 58%; width: 11px; height: 11px; animation-duration: 10s; animation-delay: 2.8s; }
+.bubble:nth-child(6) { left: 72%; width: 18px; height: 18px; animation-duration: 13s; animation-delay: 1.6s; }
+.bubble:nth-child(7) { left: 84%; width: 9px; height: 9px; animation-duration: 9.5s; animation-delay: 3.1s; }
+.bubble:nth-child(8) { left: 93%; width: 13px; height: 13px; animation-duration: 11.5s; animation-delay: 0.4s; }
+
+@keyframes hireMeBounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+    box-shadow: 0 0 14px rgba(168, 85, 247, 0.35);
+  }
+  40% {
+    transform: translateY(-8px);
+    box-shadow: 0 0 24px rgba(168, 85, 247, 0.55);
+  }
+  60% {
+    transform: translateY(-4px);
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.45);
+  }
+}
+
+.animate-hire-me {
+  animation: hireMeBounce 1.8s ease-in-out infinite;
+}
+
+@keyframes cardBorderPulse {
+  0%,
+  100% {
+    border-color: rgba(196, 181, 253, 0.9);
+    box-shadow: 0 0 0 rgba(139, 92, 246, 0);
+  }
+  50% {
+    border-color: rgba(139, 92, 246, 1);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+  }
+}
+
+.animate-card-border {
+  animation: cardBorderPulse 2.4s ease-in-out infinite;
+}
