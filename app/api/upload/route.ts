@@ -26,8 +26,9 @@ export async function POST(req: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const imgbbApiKey = process.env.IMGBB_API_KEY?.trim();
+    const isVercel = process.env.VERCEL === "1";
 
-    if (uploadType === "about" && imgbbApiKey) {
+    if (imgbbApiKey) {
       const base64Image = buffer.toString("base64");
       const formBody = new URLSearchParams();
       formBody.set("image", base64Image);
@@ -54,6 +55,26 @@ export async function POST(req: Request) {
           { status: 201 }
         );
       }
+
+      if (isVercel) {
+        return NextResponse.json(
+          {
+            ok: false,
+            message: imgbbData?.error?.message || "Image hosting failed on imgbb.",
+          },
+          { status: 502 }
+        );
+      }
+    }
+
+    if (isVercel && !imgbbApiKey) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message: "IMGBB_API_KEY is missing. Set it in Vercel environment variables.",
+        },
+        { status: 500 }
+      );
     }
 
     const uploadDir = path.join(process.cwd(), "public", "uploads", uploadType);
