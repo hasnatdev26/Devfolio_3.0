@@ -158,8 +158,8 @@ export default function ContactPage() {
                   <p>Chittagong, Bangladesh</p>
                 </div>
                 <div>
-                  <a href="mailto:info@hasnatevan.top" className="transition hover:text-slate-900">
-                    info@hasnatevan.top
+                  <a href="mailto:hasnatevan59@gmail.com" className="transition hover:text-slate-900">
+                    hasnatevan59@gmail.com
                   </a>
                 </div>
                 <div>

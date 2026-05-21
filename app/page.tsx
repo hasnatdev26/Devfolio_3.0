@@ -780,10 +780,10 @@ export default function Home() {
               </ScrollReplayAnimation>
               <ScrollReplayAnimation animationClass="animate__bounceInRight" delayMs={480}>
                 <a
-                  href="mailto:info@hasnatevan.top"
+                  href="mailto:hasnatevan59@gmail.com"
                   className="inline-flex w-full items-center justify-center rounded-full border border-white/60 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-white/10 sm:w-auto sm:px-6 sm:text-base break-all"
                 >
-                  info@hasnatevan.top
+                  hasnatevan59@gmail.com
                 </a>
               </ScrollReplayAnimation>
             </div>

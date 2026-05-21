@@ -132,10 +132,10 @@ export default function RootLayout({
                 <p>
                   Email:{" "}
                   <a
-                    href="mailto:info@hasnatevan.top"
+                    href="mailto:hasnatevan59@gmail.com"
                     className="inline-block max-w-full truncate align-bottom transition hover:text-slate-900"
                   >
-                    info@hasnatevan.top
+                    hasnatevan59@gmail.com
                   </a>
                 </p>
                 <p>
@@ -167,7 +167,7 @@ export default function RootLayout({
                   name: "Hasnat Evan",
                   jobTitle: "Full Stack Web Developer",
                   url: "https://hasnatevan.top",
-                  email: "mailto:info@hasnatevan.top",
+                  email: "mailto:hasnatevan59@gmail.com",
                   telephone: "+8801814197707",
                   address: {
                     "@type": "PostalAddress",

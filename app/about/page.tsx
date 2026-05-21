@@ -212,8 +212,8 @@ export default function AboutPage() {
                         <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-violet-100 text-violet-700">
                           <FaEnvelope className="text-xs" />
                         </span>
-                        <a href="mailto:info@hasnatevan.top" className="min-w-0 truncate whitespace-nowrap text-sm font-semibold text-slate-700 hover:text-violet-700 sm:text-base">
-                          info@hasnatevan.top
+                        <a href="mailto:hasnatevan59@gmail.com" className="min-w-0 truncate whitespace-nowrap text-sm font-semibold text-slate-700 hover:text-violet-700 sm:text-base">
+                          hasnatevan59@gmail.com
                         </a>
                       </div>
                     </ScrollReplayAnimation>
