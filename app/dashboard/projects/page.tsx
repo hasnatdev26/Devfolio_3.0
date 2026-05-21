@@ -226,6 +226,7 @@ export default function DashboardProjectsPage() {
             <input
               type="file"
               accept="image/*"
+              capture="environment"
               onChange={(e) => onUploadImage(e.target.files?.[0] || null)}
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 file:mr-3 file:rounded-md file:border-0 file:bg-violet-100 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-violet-700"
               disabled={uploading}

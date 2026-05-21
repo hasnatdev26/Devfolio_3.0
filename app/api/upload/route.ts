@@ -2,6 +2,12 @@ import { NextResponse } from "next/server";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
+function isLikelyImageFile(file: File) {
+  if (file.type && file.type.startsWith("image/")) return true;
+  const lowerName = file.name.toLowerCase();
+  return /\.(jpg|jpeg|png|gif|webp|avif|bmp|svg|heic|heif)$/i.test(lowerName);
+}
+
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();
@@ -13,9 +19,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, message: "Image file is required." }, { status: 400 });
     }
 
-    const allowedMimeTypes = new Set(["image/jpeg", "image/jpg", "image/png"]);
-    if (!allowedMimeTypes.has(file.type)) {
-      return NextResponse.json({ ok: false, message: "Only JPG and PNG images are allowed." }, { status: 400 });
+    if (!isLikelyImageFile(file)) {
+      return NextResponse.json({ ok: false, message: "Only image files are allowed." }, { status: 400 });
     }
 
     const bytes = await file.arrayBuffer();
