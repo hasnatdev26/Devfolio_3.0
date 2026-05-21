@@ -28,6 +28,7 @@ export default function DashboardProjectsPage() {
   const [message, setMessage] = useState("");
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dropTargetId, setDropTargetId] = useState<string | null>(null);
+  const [isTouchDragging, setIsTouchDragging] = useState(false);
 
   const loadProjects = async () => {
     try {
@@ -155,6 +156,7 @@ export default function DashboardProjectsPage() {
 
   const onTouchMoveItem = (e: TouchEvent<HTMLDivElement>) => {
     if (!draggingId) return;
+    e.preventDefault();
     const touch = e.touches[0];
     if (!touch) return;
 
@@ -172,16 +174,19 @@ export default function DashboardProjectsPage() {
     await reorderProjects(draggingId, targetId);
     setDraggingId(null);
     setDropTargetId(null);
+    setIsTouchDragging(false);
   };
 
   const onTouchStartItem = (id: string) => {
     setDraggingId(id);
     setDropTargetId(id);
+    setIsTouchDragging(true);
   };
 
   const onTouchCancelItem = () => {
     setDraggingId(null);
     setDropTargetId(null);
+    setIsTouchDragging(false);
   };
 
   const onDragOverItem = (e: DragEvent<HTMLDivElement>, targetId: string) => {
@@ -268,7 +273,7 @@ export default function DashboardProjectsPage() {
             <div
               key={project._id}
               data-project-id={project._id}
-              draggable
+              draggable={!isTouchDragging}
               onDragStart={() => onDragStart(project._id)}
               onDragOver={(e) => onDragOverItem(e, project._id)}
               onDrop={() => onDropItem(project._id)}
@@ -278,6 +283,7 @@ export default function DashboardProjectsPage() {
               onTouchEnd={onTouchEndItem}
               onTouchCancel={onTouchCancelItem}
               className={`rounded-xl border p-4 transition ${dropTargetId === project._id ? "border-violet-500 bg-violet-50" : "border-slate-200"}`}
+              style={{ touchAction: isTouchDragging ? "none" : "pan-y" }}
             >
               <p className="text-xs font-semibold uppercase tracking-[0.1em] text-violet-700">Drag to reorder</p>
               <p className="break-all text-xs text-slate-500">Image: {project.imageUrl}</p>

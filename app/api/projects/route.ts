@@ -11,6 +11,18 @@ type ReorderPayload = {
   orderedIds: string[];
 };
 
+function isAllowedProjectImageUrl(imageUrl: string) {
+  if (imageUrl.startsWith("/uploads/projects/")) return true;
+
+  try {
+    const parsed = new URL(imageUrl);
+    if (!["http:", "https:"].includes(parsed.protocol)) return false;
+    return ["i.ibb.co", "ibb.co"].includes(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
+
 export async function GET() {
   try {
     const db = await getDb();
@@ -47,9 +59,9 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-    if (!imageUrl.startsWith("/uploads/projects/")) {
+    if (!isAllowedProjectImageUrl(imageUrl)) {
       return NextResponse.json(
-        { ok: false, message: "Please upload project image from dashboard uploader." },
+        { ok: false, message: "Please upload project image from dashboard uploader (local or imgbb)." },
         { status: 400 }
       );
     }
