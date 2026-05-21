@@ -5,6 +5,13 @@ type LiveChatEmailParams = {
   visitorId?: string;
 };
 
+type VisitorReplyEmailParams = {
+  recipientEmail: string;
+  recipientName?: string;
+  replyMessage: string;
+  subject?: string;
+};
+
 const ADMIN_EMAIL = process.env.NODEMAILER_TO || "hasnat.dev.26@gmail.com";
 
 function hasMailConfig() {
@@ -60,6 +67,60 @@ export async function sendLiveChatNotificationEmail(params: LiveChatEmailParams)
     from,
     to: ADMIN_EMAIL,
     subject,
+    text,
+  });
+
+  return true;
+}
+
+export async function sendVisitorReplyEmail(params: VisitorReplyEmailParams) {
+  if (!hasMailConfig()) return false;
+
+  const { default: nodemailer } = await import("nodemailer");
+
+  const host = process.env.NODEMAILER_HOST || process.env.SMTP_HOST;
+  const port = Number(process.env.NODEMAILER_PORT || process.env.SMTP_PORT || 587);
+  const user = process.env.NODEMAILER_USER || process.env.SMTP_USER;
+  const pass = process.env.NODEMAILER_PASS || process.env.SMTP_PASS;
+  const from = process.env.NODEMAILER_FROM || process.env.SMTP_FROM || user;
+  const secure = port === 465;
+
+  const transporter = host
+    ? nodemailer.createTransport({
+        host,
+        port,
+        secure,
+        auth: {
+          user,
+          pass,
+        },
+      })
+    : nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user,
+          pass,
+        },
+      });
+
+  const mailSubject = params.subject?.trim()
+    ? `Reply: ${params.subject.trim()}`
+    : "Reply from Hasnat Evan";
+  const text = [
+    `Hello ${params.recipientName || "there"},`,
+    "",
+    "Thank you for your message. Here is our reply:",
+    "",
+    params.replyMessage,
+    "",
+    "Best regards,",
+    "Hasnat Evan",
+  ].join("\n");
+
+  await transporter.sendMail({
+    from,
+    to: params.recipientEmail,
+    subject: mailSubject,
     text,
   });
 

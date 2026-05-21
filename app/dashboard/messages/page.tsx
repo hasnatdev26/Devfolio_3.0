@@ -6,6 +6,8 @@ type ChatMessage = {
   _id: string;
   name: string;
   email: string;
+  phone?: string;
+  subject?: string;
   message: string;
   createdAt?: string;
   repliedAt?: string;
@@ -20,6 +22,8 @@ type VisitorThread = {
   id: string;
   title: string;
   subtitle: string;
+  phone?: string;
+  subject?: string;
   unread: number;
   lastMessageAt: number;
   messages: ChatMessage[];
@@ -95,7 +99,10 @@ export default function DashboardMessagesPage() {
         body: JSON.stringify({
           name: "Admin",
           email: "admin@local.chat",
+          subject: activeThread.subject || "",
           visitorId: activeThread.visitorId || activeThread.id,
+          recipientEmail: activeThread.email || "",
+          recipientName: activeThread.name || activeThread.title || "Visitor",
           message: reply,
           sender: "admin",
         }),
@@ -165,6 +172,8 @@ export default function DashboardMessagesPage() {
         id: key,
         title: msg.name || "Visitor",
         subtitle: msg.email || "visitor@local.chat",
+        phone: msg.phone || "",
+        subject: msg.subject || "",
         unread: msg.sender === "admin" || msg.seenByAdmin ? 0 : 1,
         lastMessageAt: createdMs,
         messages: [msg],
@@ -174,6 +183,12 @@ export default function DashboardMessagesPage() {
       });
     } else {
       existing.messages.push(msg);
+      if (!existing.phone && msg.phone) {
+        existing.phone = msg.phone;
+      }
+      if (!existing.subject && msg.subject) {
+        existing.subject = msg.subject;
+      }
       existing.unread += msg.sender === "admin" || msg.seenByAdmin ? 0 : 1;
       if (createdMs > existing.lastMessageAt) {
         existing.lastMessageAt = createdMs;
@@ -242,6 +257,8 @@ export default function DashboardMessagesPage() {
                       ) : null}
                     </div>
                     <p className="mt-1 break-all text-xs text-slate-600">{thread.subtitle}</p>
+                    {thread.phone ? <p className="mt-1 text-xs text-slate-600">Phone: {thread.phone}</p> : null}
+                    {thread.subject ? <p className="mt-1 text-xs text-slate-600">Subject: {thread.subject}</p> : null}
                     <p className="mt-1 text-[11px] leading-4 text-slate-500">
                       {thread.lastMessageAt > 0
                         ? formatDateTime(new Date(thread.lastMessageAt).toISOString())
@@ -269,6 +286,8 @@ export default function DashboardMessagesPage() {
                 <div className="mb-3 border-b border-slate-200 pb-3">
                   <p className="text-base font-semibold text-slate-900">{activeThread.title}</p>
                   <p className="text-sm text-slate-600">{activeThread.subtitle}</p>
+                  {activeThread.phone ? <p className="text-sm text-slate-600">Phone: {activeThread.phone}</p> : null}
+                  {activeThread.subject ? <p className="text-sm text-slate-600">Subject: {activeThread.subject}</p> : null}
                 </div>
 
                 <div className="mb-4 flex-1 space-y-3 overflow-y-auto pr-1">

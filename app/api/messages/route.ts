@@ -1,16 +1,20 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
-import { sendLiveChatNotificationEmail } from "@/lib/email";
+import { sendLiveChatNotificationEmail, sendVisitorReplyEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 
 type MessagePayload = {
   name: string;
   email: string;
+  phone?: string;
+  subject?: string;
   message: string;
   visitorId?: string;
   sender?: "visitor" | "admin";
+  recipientEmail?: string;
+  recipientName?: string;
 };
 
 type ReplyPayload = {
@@ -49,9 +53,13 @@ export async function POST(req: Request) {
     const body = (await req.json()) as Partial<MessagePayload>;
     const name = body.name?.trim();
     const email = body.email?.trim();
+    const phone = body.phone?.trim();
+    const subject = body.subject?.trim();
     const message = body.message?.trim();
     const visitorId = body.visitorId?.trim();
     const sender = body.sender === "admin" ? "admin" : "visitor";
+    const recipientEmail = body.recipientEmail?.trim();
+    const recipientName = body.recipientName?.trim();
 
     if (!name || !email || !message) {
       return NextResponse.json(
@@ -64,6 +72,8 @@ export async function POST(req: Request) {
     const result = await db.collection("messages").insertOne({
       name,
       email,
+      phone: phone || "",
+      subject: subject || "",
       message,
       visitorId,
       sender,
@@ -81,6 +91,20 @@ export async function POST(req: Request) {
       }).catch(() => {
         // ignore email errors so chat submission always succeeds
       });
+    }
+
+    if (sender === "admin" && recipientEmail) {
+      const blockedEmails = new Set(["visitor@local.chat", "admin@local.chat"]);
+      if (!blockedEmails.has(recipientEmail.toLowerCase())) {
+        void sendVisitorReplyEmail({
+          recipientEmail,
+          recipientName,
+          replyMessage: message,
+          subject,
+        }).catch(() => {
+          // ignore email errors so admin reply save still succeeds
+        });
+      }
     }
 
     return NextResponse.json(

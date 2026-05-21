@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import Image from "next/image";
 import { FaEnvelope } from "react-icons/fa";
 import { FaFacebookF, FaGithub, FaLinkedinIn } from "react-icons/fa";
@@ -57,6 +57,49 @@ function ScrollReplayAnimation({
 }
 
 export default function ContactPage() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState("");
+
+  const handleContactSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const name = String(formData.get("fullName") || "").trim();
+    const email = String(formData.get("email") || "").trim();
+    const phone = String(formData.get("phone") || "").trim();
+    const subject = String(formData.get("subject") || "").trim();
+    const message = String(formData.get("message") || "").trim();
+
+    if (!name || !email || !message) {
+      setSubmitMessage("Name, email and message are required.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitMessage("");
+    try {
+      const res = await fetch("/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          phone,
+          subject,
+          message,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data?.ok) throw new Error(data?.message || "Failed to send message.");
+      setSubmitMessage("Message sent successfully.");
+      form.reset();
+    } catch (error) {
+      setSubmitMessage(error instanceof Error ? error.message : "Failed to send message.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <>
       <section id="contact" aria-label="Contact banner" className="w-full bg-white">
@@ -162,7 +205,7 @@ export default function ContactPage() {
 
           <ScrollReplayAnimation animationClass="animate__backInRight" delayMs={120}>
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-              <form className="space-y-4" action="#" method="post">
+              <form className="space-y-4" onSubmit={handleContactSubmit}>
                 <ScrollReplayAnimation animationClass="animate__fadeInUp" delayMs={180}>
                   <div>
                     <label htmlFor="full-name" className="mb-2 block text-sm font-medium text-slate-700">
@@ -172,6 +215,7 @@ export default function ContactPage() {
                       id="full-name"
                       name="fullName"
                       type="text"
+                      required
                       placeholder="Enter your full name"
                       className="w-full rounded-md border border-slate-300 px-4 py-3 text-slate-900 outline-none transition focus:border-slate-900"
                     />
@@ -186,6 +230,7 @@ export default function ContactPage() {
                       id="email-address"
                       name="email"
                       type="email"
+                      required
                       placeholder="Enter your email address"
                       className="w-full rounded-md border border-slate-300 px-4 py-3 text-slate-900 outline-none transition focus:border-slate-900"
                     />
@@ -228,6 +273,7 @@ export default function ContactPage() {
                       id="message"
                       name="message"
                       rows={5}
+                      required
                       placeholder="Write your message"
                       className="w-full rounded-md border border-slate-300 px-4 py-3 text-slate-900 outline-none transition focus:border-slate-900"
                     />
@@ -236,11 +282,13 @@ export default function ContactPage() {
                 <ScrollReplayAnimation animationClass="animate__backInUp" delayMs={480}>
                   <button
                     type="submit"
+                    disabled={isSubmitting}
                     className="inline-flex items-center rounded-md border border-violet-400/60 bg-gradient-to-r from-fuchsia-500 via-purple-600 to-violet-700 px-5 py-3 font-semibold text-white shadow-[0_0_18px_rgba(168,85,247,0.45)] transition hover:brightness-110"
                   >
-                    Send Us Message &rarr;
+                    {isSubmitting ? "Sending..." : "Send Us Message ->"}
                   </button>
                 </ScrollReplayAnimation>
+                {submitMessage ? <p className="text-sm text-slate-700">{submitMessage}</p> : null}
               </form>
             </div>
           </ScrollReplayAnimation>
