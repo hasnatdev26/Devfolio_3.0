@@ -113,14 +113,9 @@ export default function ContactPage() {
             priority
           />
           <div className="bubble-layer" aria-hidden="true">
-            <span className="bubble" />
-            <span className="bubble" />
-            <span className="bubble" />
-            <span className="bubble" />
-            <span className="bubble" />
-            <span className="bubble" />
-            <span className="bubble" />
-            <span className="bubble" />
+            {Array.from({ length: 20 }).map((_, index) => (
+              <span key={`contact-bubble-${index}`} className="bubble" />
+            ))}
           </div>
           <div className="pointer-events-none absolute inset-0 bg-black/45" />
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
@@ -325,7 +320,7 @@ export default function ContactPage() {
             <ScrollReplayAnimation animationClass="animate__backInUp" delayMs={180}>
               <div className="group animate-card-border rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-100 via-purple-50 to-fuchsia-100 p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-violet-400 hover:shadow-lg">
                 <p className="text-lg font-semibold text-slate-900">Work Type</p>
-                <p className="mt-3 leading-7 text-slate-600 transition group-hover:text-slate-700">
+                <p className="mt-3 whitespace-nowrap leading-7 text-slate-600 transition group-hover:text-slate-700">
                   MERN web apps, UI updates, bug fixing.
                 </p>
               </div>
@@ -334,8 +329,8 @@ export default function ContactPage() {
             <ScrollReplayAnimation animationClass="animate__backInRight" delayMs={280}>
               <div className="group animate-card-border rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-100 via-purple-50 to-fuchsia-100 p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-violet-400 hover:shadow-lg sm:col-span-2 lg:col-span-1">
                 <p className="text-lg font-semibold text-slate-900">Availability</p>
-                <p className="mt-3 leading-7 text-slate-600 transition group-hover:text-slate-700">
-                  Remote collaboration, worldwide clients.
+                <p className="mt-3 whitespace-nowrap leading-7 text-slate-600 transition group-hover:text-slate-700">
+                  Remote work, global clients.
                 </p>
               </div>
             </ScrollReplayAnimation>

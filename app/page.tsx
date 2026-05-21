@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { FaCheckCircle, FaCode, FaComments, FaDatabase, FaLayerGroup, FaLaptopCode, FaPaintBrush, FaWhatsapp } from "react-icons/fa";
+import { FaCheckCircle, FaCode, FaDatabase, FaLayerGroup, FaLaptopCode, FaPaintBrush } from "react-icons/fa";
 import { defaultSiteLinks, type SiteLinks } from "@/lib/site-links";
 
 function isMobileViewport() {
@@ -459,14 +459,9 @@ export default function Home() {
         }}
       >
         <div className="bubble-layer" aria-hidden="true">
-          <span className="bubble" />
-          <span className="bubble" />
-          <span className="bubble" />
-          <span className="bubble" />
-          <span className="bubble" />
-          <span className="bubble" />
-          <span className="bubble" />
-          <span className="bubble" />
+          {Array.from({ length: 20 }).map((_, index) => (
+            <span key={`hero-bubble-${index}`} className="bubble" />
+          ))}
         </div>
         <main className="mx-auto flex w-full max-w-6xl flex-1 items-center px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
           <div className="relative z-10 grid w-full items-center gap-8 lg:grid-cols-2 lg:gap-10">
@@ -793,29 +788,6 @@ export default function Home() {
 
       <div className="sr-only">
         <section id="projects" aria-label="Projects" />
-      </div>
-
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
-        <button
-          type="button"
-          aria-label="Open live chat"
-          onClick={() => setIsLiveChatOpen(true)}
-          className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-sky-500 text-white shadow-[0_10px_24px_rgba(14,165,233,0.45)] transition hover:scale-105 hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 motion-safe:animate-bounce"
-        >
-          <FaComments className="text-3xl" />
-        </button>
-        <a
-          href="https://wa.me/8801814197707"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Chat on WhatsApp"
-          className="relative inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_12px_30px_rgba(37,211,102,0.45)] transition hover:scale-105 hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-[#25D366] focus:ring-offset-2"
-        >
-          <FaWhatsapp className="text-4xl" />
-          <span className="absolute -right-1 -top-1 inline-flex h-7 w-7 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white">
-            1
-          </span>
-        </a>
       </div>
 
       {isLiveChatOpen ? (

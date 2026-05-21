@@ -6,6 +6,7 @@ import FooterQuickLinks from "./FooterQuickLinks";
 import FooterSocialLinks from "./FooterSocialLinks";
 import FooterEmailSignup from "./FooterEmailSignup";
 import ScrollProgress from "./ScrollProgress";
+import FloatingContactButtons from "./FloatingContactButtons";
 import "./globals.css";
 import "animate.css";
 
@@ -102,6 +103,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-white text-slate-900">
         <ScrollProgress />
         <Navbar />
+        <FloatingContactButtons />
         <main className="flex-1 pt-16">{children}</main>
         <footer className="border-t border-slate-200 bg-white">
           <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-10 text-sm text-slate-600 sm:px-6 md:grid-cols-2 lg:grid-cols-3 lg:px-8">

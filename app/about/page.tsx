@@ -117,14 +117,9 @@ export default function AboutPage() {
             className="h-[220px] w-full object-cover object-right sm:h-[280px] md:h-[330px] animate-banner-image"
           />
           <div className="bubble-layer" aria-hidden="true">
-            <span className="bubble" />
-            <span className="bubble" />
-            <span className="bubble" />
-            <span className="bubble" />
-            <span className="bubble" />
-            <span className="bubble" />
-            <span className="bubble" />
-            <span className="bubble" />
+            {Array.from({ length: 20 }).map((_, index) => (
+              <span key={`about-bubble-${index}`} className="bubble" />
+            ))}
           </div>
           <div className="pointer-events-none absolute inset-0 bg-black/45" />
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
