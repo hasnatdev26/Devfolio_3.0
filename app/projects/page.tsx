@@ -64,6 +64,7 @@ function ScrollReplayAnimation({
 export default function ProjectsPage() {
   const [projectList, setProjectList] = useState<ProjectItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const skeletonCards = [1, 2, 3, 4, 5, 6];
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -129,9 +130,17 @@ export default function ProjectsPage() {
           </div>
 
           {loading ? (
-            <ScrollReplayAnimation animationClass="animate__fadeIn" delayMs={0}>
-              <p className="text-center text-sm text-slate-600">Loading projects...</p>
-            </ScrollReplayAnimation>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
+              {skeletonCards.map((item) => (
+                <article key={item} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                  <div className="skeleton-shimmer relative h-56 w-full bg-slate-200" />
+                  <div className="space-y-3 p-5">
+                    <div className="skeleton-shimmer relative h-4 w-2/3 rounded-lg bg-slate-200" />
+                    <div className="skeleton-shimmer relative h-10 w-full rounded-xl bg-slate-200" />
+                  </div>
+                </article>
+              ))}
+            </div>
           ) : null}
           {!loading && projectList.length === 0 ? (
             <ScrollReplayAnimation animationClass="animate__fadeInUp" delayMs={0}>

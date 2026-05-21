@@ -25,6 +25,8 @@ type ReplyPayload = {
 type MarkSeenPayload = {
   visitorId: string;
   markSeen: boolean;
+  email?: string;
+  name?: string;
 };
 
 export async function GET(req: Request) {
@@ -125,12 +127,30 @@ export async function PATCH(req: Request) {
     const id = body.id?.trim();
     const reply = body.reply?.trim();
     const visitorId = body.visitorId?.trim();
+    const email = body.email?.trim();
+    const name = body.name?.trim();
     const markSeen = body.markSeen === true;
 
-    if (visitorId && markSeen) {
+    if (markSeen && (visitorId || email || name)) {
       const db = await getDb();
+      const filter: {
+        visitorId?: string;
+        email?: string;
+        name?: string;
+        sender: { $ne: "admin" };
+        seenByAdmin: { $ne: true };
+      } = {
+        sender: { $ne: "admin" },
+        seenByAdmin: { $ne: true },
+      };
+      if (visitorId) {
+        filter.visitorId = visitorId;
+      } else {
+        if (email) filter.email = email;
+        if (name) filter.name = name;
+      }
       await db.collection("messages").updateMany(
-        { visitorId, sender: { $ne: "admin" }, seenByAdmin: { $ne: true } },
+        filter,
         { $set: { seenByAdmin: true } }
       );
       return NextResponse.json({ ok: true, message: "Messages marked as seen." }, { status: 200 });

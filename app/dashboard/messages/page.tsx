@@ -145,13 +145,15 @@ export default function DashboardMessagesPage() {
 
   const markThreadAsSeen = useCallback(
     async (thread: VisitorThread | null) => {
-      if (!thread?.visitorId) return;
+      if (!thread) return;
       try {
         await fetch("/api/messages", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             visitorId: thread.visitorId,
+            email: thread.email,
+            name: thread.name,
             markSeen: true,
           }),
         });
@@ -250,7 +252,7 @@ export default function DashboardMessagesPage() {
                   >
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-sm font-semibold text-slate-900">{thread.title}</p>
-                      {thread.unread > 0 ? (
+                      {thread.unread > 0 && activeVisitorId !== thread.id ? (
                         <span className="rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-bold text-white">
                           {thread.unread}
                         </span>

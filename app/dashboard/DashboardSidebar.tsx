@@ -25,7 +25,7 @@ export default function DashboardSidebar() {
       <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-violet-700">
         Dashboard
       </p>
-      <nav className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0 lg:pb-0">
+      <nav className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:flex lg:flex-col">
         {dashboardLinks.map((item) => (
           <Link
             key={item.href}
@@ -33,8 +33,8 @@ export default function DashboardSidebar() {
             aria-current={isActive(item.href) ? "page" : undefined}
             className={
               isActive(item.href)
-                ? "shrink-0 whitespace-nowrap rounded-lg bg-violet-50 px-3 py-2 text-sm font-semibold text-violet-700"
-                : "shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                ? "rounded-lg bg-violet-50 px-3 py-2 text-center text-xs font-semibold text-violet-700 sm:text-sm lg:text-left"
+                : "rounded-lg px-3 py-2 text-center text-xs font-medium text-slate-700 transition hover:bg-slate-100 sm:text-sm lg:text-left"
             }
           >
             {item.label}

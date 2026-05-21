@@ -196,3 +196,63 @@ body {
 .animate-card-border {
   animation: cardBorderPulse 2.4s ease-in-out infinite;
 }
+
+@keyframes skeletonShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton-shimmer {
+  overflow: hidden;
+}
+
+.skeleton-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translateX(-100%);
+  animation: skeletonShimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes profileRingSpin {
+  0% {
+    transform: rotate(0deg);
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+    filter: hue-rotate(25deg);
+  }
+}
+
+.profile-ring-spin {
+  position: relative;
+  isolation: isolate;
+}
+
+.profile-ring-spin::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: conic-gradient(
+    from 0deg,
+    #8b5cf6,
+    #d946ef,
+    #7c3aed,
+    #a855f7,
+    #8b5cf6
+  );
+  animation: profileRingSpin 3.2s linear infinite;
+  z-index: -1;
+}

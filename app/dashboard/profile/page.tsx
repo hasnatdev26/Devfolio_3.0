@@ -7,6 +7,7 @@ export default function DashboardProfilePage() {
   const [form, setForm] = useState<AboutProfile>(defaultAboutProfile);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingProfile, setUploadingProfile] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -31,6 +32,7 @@ export default function DashboardProfilePage() {
       setMessage("Only image files are allowed.");
       return;
     }
+    if (target === "coverImage") setUploadingCover(true);
     if (target === "profileImage") setUploadingProfile(true);
     setMessage("");
     try {
@@ -48,6 +50,7 @@ export default function DashboardProfilePage() {
     } catch {
       setMessage("Image upload failed.");
     } finally {
+      if (target === "coverImage") setUploadingCover(false);
       if (target === "profileImage") setUploadingProfile(false);
     }
   };
@@ -80,10 +83,23 @@ export default function DashboardProfilePage() {
       <p className="text-sm font-semibold uppercase tracking-[0.2em] text-violet-700">Profile</p>
       <h1 className="mt-3 text-2xl font-bold text-slate-900 sm:text-3xl">About Profile Images</h1>
       <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
-        Upload profile photo for your About page from this dashboard section.
+        Upload cover and profile photo for your About page from this dashboard section.
       </p>
 
       <form className="mt-6 space-y-5" onSubmit={onSubmit}>
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-slate-700">Upload Cover Photo</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => onUpload(e.target.files?.[0] || null, "coverImage")}
+            disabled={uploadingCover}
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-medium hover:file:bg-slate-200"
+          />
+          {uploadingCover ? <p className="text-xs text-slate-500">Uploading cover image...</p> : null}
+          {form.coverImage ? <p className="break-all text-xs text-slate-500">Current cover: {form.coverImage}</p> : null}
+        </div>
+
         <div className="space-y-2">
           <label className="text-sm font-semibold text-slate-700">Upload Profile Photo</label>
           <input
@@ -94,11 +110,12 @@ export default function DashboardProfilePage() {
             className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-medium hover:file:bg-slate-200"
           />
           {uploadingProfile ? <p className="text-xs text-slate-500">Uploading profile image...</p> : null}
+          {form.profileImage ? <p className="break-all text-xs text-slate-500">Current profile: {form.profileImage}</p> : null}
         </div>
 
         <button
           type="submit"
-          disabled={loading || saving || uploadingProfile}
+          disabled={loading || saving || uploadingCover || uploadingProfile}
           className="w-full rounded-md border border-violet-400/60 bg-gradient-to-r from-fuchsia-500 via-purple-600 to-violet-700 px-5 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
           {saving ? "Saving..." : "Save About Images"}

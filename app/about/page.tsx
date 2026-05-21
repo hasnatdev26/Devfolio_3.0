@@ -78,10 +78,26 @@ export default function AboutPage() {
   useEffect(() => {
     const loadAboutProfile = async () => {
       try {
+        const cached = window.localStorage.getItem("about_profile_cache");
+        if (cached) {
+          const parsed = JSON.parse(cached) as Partial<AboutProfile>;
+          setAboutProfile({ ...defaultAboutProfile, ...parsed });
+        }
+      } catch {
+        // no-op
+      }
+
+      try {
         const res = await fetch("/api/about-profile");
         const data = await res.json();
         if (data?.ok && data?.data) {
-          setAboutProfile({ ...defaultAboutProfile, ...data.data });
+          const nextProfile = { ...defaultAboutProfile, ...data.data };
+          setAboutProfile(nextProfile);
+          try {
+            window.localStorage.setItem("about_profile_cache", JSON.stringify(nextProfile));
+          } catch {
+            // no-op
+          }
         }
       } catch {
         setAboutProfile(defaultAboutProfile);
@@ -96,7 +112,7 @@ export default function AboutPage() {
         <div className="relative overflow-hidden bg-white">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={aboutProfile.coverImage || defaultAboutProfile.coverImage}
+            src={defaultAboutProfile.coverImage}
             alt="About banner"
             className="h-[220px] w-full object-cover object-right sm:h-[280px] md:h-[330px] animate-banner-image"
           />
@@ -124,40 +140,45 @@ export default function AboutPage() {
         <div className="mx-auto w-full max-w-6xl px-4 pb-0 pt-10 sm:px-6 sm:pt-12 lg:px-8">
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div className="h-1.5 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-purple-600" />
-            <div className="grid lg:grid-cols-[1fr_1.35fr]">
+            <div className="grid lg:grid-cols-[0.95fr_1.05fr] xl:grid-cols-[1fr_1.2fr]">
               <aside className="border-b border-slate-200 bg-white lg:border-b-0 lg:border-r">
                 <ScrollReplayAnimation animationClass="animate__backInLeft" delayMs={0}>
-                  <div className="overflow-hidden">
+                  <div className="relative">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={aboutProfile.profileImage || defaultAboutProfile.profileImage}
-                      alt="Hasnat Evan portrait"
-                      className="h-[240px] w-full object-cover object-top sm:h-[300px]"
+                      src={aboutProfile.coverImage || defaultAboutProfile.coverImage}
+                      alt="Profile cover"
+                      className="h-36 w-full object-cover object-center sm:h-44"
+                      loading="eager"
+                      fetchPriority="high"
+                      decoding="async"
                     />
+                    <div className="absolute -bottom-14 left-1/2 -translate-x-1/2">
+                      <div className="profile-ring-spin relative inline-flex rounded-full p-[4px] shadow-md">
+                        <div className="inline-flex rounded-full bg-white p-1.5">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={aboutProfile.profileImage || defaultAboutProfile.profileImage}
+                            alt="Hasnat Evan portrait"
+                            className="h-32 w-32 rounded-full border-4 border-white object-cover object-top sm:h-36 sm:w-36"
+                            loading="eager"
+                            fetchPriority="high"
+                            decoding="async"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </ScrollReplayAnimation>
-                <div className="px-6 py-5 text-center">
+                <div className="px-4 pb-5 pt-16 text-center sm:px-6">
                   <ScrollReplayAnimation animationClass="animate__backInUp" delayMs={80}>
                     <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">MOHAMMAD AZIMUL HASNAT</h2>
                   </ScrollReplayAnimation>
                   <ScrollReplayAnimation animationClass="animate__backInUp" delayMs={150}>
                     <p className="mt-2 text-lg font-medium text-violet-700">Full-Stack Web Developer</p>
                   </ScrollReplayAnimation>
-                </div>
-              </aside>
-
-              <div className="bg-slate-50/80 p-5 sm:p-6">
-                <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-start">
-                  <div>
-                    <ScrollReplayAnimation animationClass="animate__backInDown" delayMs={40}>
-                      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-violet-700">About</p>
-                    </ScrollReplayAnimation>
-                    <ScrollReplayAnimation animationClass="animate__backInRight" delayMs={110}>
-                      <h2 className="mt-3 text-2xl font-bold text-slate-900 sm:text-4xl">About Me</h2>
-                    </ScrollReplayAnimation>
-                  </div>
-                  <ScrollReplayAnimation animationClass="animate__backInLeft" delayMs={180}>
-                    <div className="flex shrink-0 self-start items-center gap-2.5 sm:gap-3">
+                  <ScrollReplayAnimation animationClass="animate__backInUp" delayMs={200}>
+                    <div className="mt-4 flex items-center justify-center gap-2.5 sm:gap-3">
                       <a
                         href={links.facebook || defaultSiteLinks.facebook}
                         target="_blank"
@@ -187,17 +208,8 @@ export default function AboutPage() {
                       </a>
                     </div>
                   </ScrollReplayAnimation>
-                </div>
-                <div className="mt-4 grid gap-4 lg:grid-cols-[1.1fr_1fr]">
-                  <ScrollReplayAnimation animationClass="animate__backInLeft" delayMs={240}>
-                    <p className="text-sm leading-7 text-slate-600 sm:text-base sm:leading-8 lg:text-lg">
-                      I am MOHAMMAD AZIMUL HASNAT, a full-stack web developer based in Chattogram, Bangladesh. I build modern,
-                      responsive, and scalable web applications with a strong focus on clean architecture, performance,
-                      and long-term maintainability.
-                    </p>
-                  </ScrollReplayAnimation>
-                  <div className="space-y-3 rounded-2xl border border-violet-100 bg-gradient-to-br from-white to-violet-50/40 p-3.5 sm:p-5">
-                    <ScrollReplayAnimation animationClass="animate__backInRight" delayMs={300}>
+                  <div className="mt-5 space-y-3 text-left">
+                    <ScrollReplayAnimation animationClass="animate__backInUp" delayMs={240}>
                       <div className="flex items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-3 py-3">
                         <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-violet-100 text-violet-700">
                           <FaPhoneAlt className="text-xs" />
@@ -207,33 +219,106 @@ export default function AboutPage() {
                         </a>
                       </div>
                     </ScrollReplayAnimation>
-                    <ScrollReplayAnimation animationClass="animate__backInRight" delayMs={360}>
+                    <ScrollReplayAnimation animationClass="animate__backInUp" delayMs={280}>
                       <div className="flex items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-3 py-3">
                         <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-violet-100 text-violet-700">
                           <FaEnvelope className="text-xs" />
                         </span>
-                        <a href="mailto:hasnatevan59@gmail.com" className="min-w-0 truncate whitespace-nowrap text-sm font-semibold text-slate-700 hover:text-violet-700 sm:text-base">
+                        <a href="mailto:hasnatevan59@gmail.com" className="min-w-0 break-all text-sm font-semibold text-slate-700 hover:text-violet-700 sm:text-base">
                           hasnatevan59@gmail.com
                         </a>
                       </div>
                     </ScrollReplayAnimation>
-                    <ScrollReplayAnimation animationClass="animate__backInRight" delayMs={420}>
+                    <ScrollReplayAnimation animationClass="animate__backInUp" delayMs={320}>
                       <div className="flex items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-3 py-3">
                         <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-violet-100 text-violet-700">
                           <FaMapMarkerAlt className="text-xs" />
                         </span>
-                        <span className="min-w-0 truncate whitespace-nowrap text-sm font-semibold text-slate-700 sm:text-base">Chattogram, Bangladesh</span>
+                        <span className="min-w-0 break-words text-sm font-semibold text-slate-700 sm:text-base">Chattogram, Bangladesh</span>
                       </div>
                     </ScrollReplayAnimation>
-                    <ScrollReplayAnimation animationClass="animate__backInRight" delayMs={480}>
-                      <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200/80 bg-white px-3 py-3">
+                    <ScrollReplayAnimation animationClass="animate__backInUp" delayMs={360}>
+                      <div className="flex items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-3 py-3">
                         <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-violet-100 text-violet-700">
                           <FaRegUserCircle className="text-sm" />
                         </span>
-                        <span className="text-right text-sm font-semibold text-slate-700 sm:text-base">23</span>
+                        <span className="min-w-0 break-words text-sm font-semibold text-slate-700 sm:text-base">23</span>
                       </div>
                     </ScrollReplayAnimation>
                   </div>
+                </div>
+              </aside>
+
+              <div className="bg-slate-50/80 p-4 sm:p-6">
+                <div className="flex flex-col items-start justify-between gap-3 sm:gap-4">
+                  <div>
+                    <ScrollReplayAnimation animationClass="animate__backInDown" delayMs={40}>
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700 sm:text-sm sm:tracking-[0.2em]">About</p>
+                    </ScrollReplayAnimation>
+                    <ScrollReplayAnimation animationClass="animate__backInRight" delayMs={110}>
+                      <h2 className="mt-2 text-2xl font-bold leading-tight text-slate-900 sm:mt-3 sm:text-4xl">About Me</h2>
+                    </ScrollReplayAnimation>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <ScrollReplayAnimation animationClass="animate__backInLeft" delayMs={240}>
+                    <p className="text-sm leading-7 text-slate-600 sm:text-base sm:leading-8 lg:text-[1.05rem]">
+                      I am MOHAMMAD AZIMUL HASNAT, a full-stack web developer based in Chattogram, Bangladesh. I build modern,
+                      responsive, and scalable web applications with a strong focus on clean architecture, performance,
+                      and long-term maintainability.
+                    </p>
+                  </ScrollReplayAnimation>
+                  <ScrollReplayAnimation animationClass="animate__backInUp" delayMs={300}>
+                    <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-xl border border-slate-200 bg-white p-4">
+                        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-700">Core Focus</p>
+                        <p className="mt-2 text-sm leading-6 text-slate-600">Clean architecture, reusable components, and maintainable code structure for long-term growth.</p>
+                      </div>
+                      <div className="rounded-xl border border-slate-200 bg-white p-4">
+                        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-700">Work Style</p>
+                        <p className="mt-2 text-sm leading-6 text-slate-600">Fast iteration, responsive communication, and delivery focused on practical business value.</p>
+                      </div>
+                    </div>
+                  </ScrollReplayAnimation>
+                  <ScrollReplayAnimation animationClass="animate__backInUp" delayMs={360}>
+                    <div className="mt-4 rounded-xl border border-violet-100 bg-gradient-to-r from-violet-50 to-fuchsia-50 p-4 sm:p-5">
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-700">Tech Stack</p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {[
+                          "HTML",
+                          "CSS",
+                          "JavaScript",
+                          "TypeScript",
+                          "Tailwind CSS",
+                          "React",
+                          "Next.js",
+                          "Redux Toolkit",
+                          "React Query",
+                          "Node.js",
+                          "Express",
+                          "Socket.IO",
+                          "MongoDB",
+                          "Mongoose",
+                          "Postman",
+                          "Axios",
+                          "Firebase",
+                          "JWT",
+                          "REST API",
+                          "Prisma",
+                          "MySQL",
+                          "Figma",
+                          "Git",
+                          "GitHub",
+                          "Netlify",
+                          "Vercel",
+                        ].map((tech) => (
+                          <span key={tech} className="rounded-full border border-violet-200 bg-white px-3 py-1 text-xs font-semibold text-violet-700">
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </ScrollReplayAnimation>
                 </div>
               </div>
             </div>
