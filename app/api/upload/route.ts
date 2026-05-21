@@ -20,14 +20,50 @@ export async function POST(req: Request) {
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+    const imgbbApiKey = process.env.IMGBB_API_KEY?.trim();
+
+    if (uploadType === "about" && imgbbApiKey) {
+      const base64Image = buffer.toString("base64");
+      const formBody = new URLSearchParams();
+      formBody.set("image", base64Image);
+      formBody.set("name", file.name.replace(/\.[^.]+$/, ""));
+
+      const imgbbRes = await fetch(`https://api.imgbb.com/1/upload?key=${encodeURIComponent(imgbbApiKey)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formBody.toString(),
+      });
+      const imgbbData = (await imgbbRes.json()) as {
+        success?: boolean;
+        data?: { url?: string; display_url?: string };
+        error?: { message?: string };
+      };
+
+      if (!imgbbRes.ok || !imgbbData?.success || !imgbbData?.data?.url) {
+        return NextResponse.json(
+          {
+            ok: false,
+            message: imgbbData?.error?.message || "Failed to upload image to imgbb.",
+          },
+          { status: 502 }
+        );
+      }
+
+      return NextResponse.json(
+        {
+          ok: true,
+          message: "Image uploaded successfully.",
+          imageUrl: imgbbData.data.display_url || imgbbData.data.url,
+        },
+        { status: 201 }
+      );
+    }
 
     const uploadDir = path.join(process.cwd(), "public", "uploads", uploadType);
     await mkdir(uploadDir, { recursive: true });
-
     const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
     const fileName = `${Date.now()}-${safeName}`;
     const filePath = path.join(uploadDir, fileName);
-
     await writeFile(filePath, buffer);
 
     return NextResponse.json(
