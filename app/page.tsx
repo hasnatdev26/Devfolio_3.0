@@ -271,7 +271,14 @@ export default function Home() {
   const chatScrollRef = useRef<HTMLDivElement | null>(null);
   const [techActive, setTechActive] = useState(false);
   const [links, setLinks] = useState<SiteLinks>(defaultSiteLinks);
-  const [isLiveChatOpen, setIsLiveChatOpen] = useState(false);
+  const [isLiveChatOpen, setIsLiveChatOpen] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const shouldOpen = window.sessionStorage.getItem("open_live_chat_once") === "1";
+    if (shouldOpen) {
+      window.sessionStorage.removeItem("open_live_chat_once");
+    }
+    return shouldOpen;
+  });
   const [chatMessage, setChatMessage] = useState("");
   const [chatStatus, setChatStatus] = useState("");
   const [isChatSubmitting, setIsChatSubmitting] = useState(false);
@@ -444,6 +451,12 @@ export default function Home() {
       }
     };
     loadLinks();
+  }, []);
+
+  useEffect(() => {
+    const openChat = () => setIsLiveChatOpen(true);
+    window.addEventListener("open-live-chat", openChat);
+    return () => window.removeEventListener("open-live-chat", openChat);
   }, []);
 
   return (
