@@ -44,24 +44,16 @@ export async function POST(req: Request) {
         error?: { message?: string };
       };
 
-      if (!imgbbRes.ok || !imgbbData?.success || !imgbbData?.data?.url) {
+      if (imgbbRes.ok && imgbbData?.success && imgbbData?.data?.url) {
         return NextResponse.json(
           {
-            ok: false,
-            message: imgbbData?.error?.message || "Failed to upload image to imgbb.",
+            ok: true,
+            message: "Image uploaded successfully.",
+            imageUrl: imgbbData.data.display_url || imgbbData.data.url,
           },
-          { status: 502 }
+          { status: 201 }
         );
       }
-
-      return NextResponse.json(
-        {
-          ok: true,
-          message: "Image uploaded successfully.",
-          imageUrl: imgbbData.data.display_url || imgbbData.data.url,
-        },
-        { status: 201 }
-      );
     }
 
     const uploadDir = path.join(process.cwd(), "public", "uploads", uploadType);
