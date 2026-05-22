@@ -12,10 +12,29 @@ const navItems = [
   { key: "contact", label: "Contact", href: "/contact" },
 ] as const;
 
+const overlayRoutes = new Set(["/", "/projects", "/about", "/contact"]);
+const overlayHeroIds: Record<string, string> = {
+  "/": "home",
+  "/projects": "projects",
+  "/about": "about",
+  "/contact": "contact",
+};
+const NAVBAR_HEIGHT = 64;
+
 export default function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const isOverlayPage = overlayRoutes.has(pathname);
+  const isOverlayMode = isOverlayPage && !isScrolled && !isOpen;
+  const navLinkClass = isOverlayMode
+    ? "text-white/90 transition hover:text-white"
+    : "text-slate-600 transition hover:text-slate-900";
+  const activeLinkClass = isOverlayMode ? "text-white transition" : "text-violet-700 transition";
+  const menuButtonClass = isOverlayMode
+    ? "border-white/60 text-white hover:border-white hover:text-white"
+    : "border-slate-300 text-slate-700 hover:border-slate-900 hover:text-slate-900";
   const isActivePath = (href: string) => {
     if (href === "/") return pathname === "/";
     return pathname === href || pathname.startsWith(`${href}/`);
@@ -46,18 +65,54 @@ export default function Navbar() {
     };
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const heroId = overlayHeroIds[pathname];
+    const handleScroll = () => {
+      if (!heroId) {
+        setIsScrolled(window.scrollY > 12);
+        return;
+      }
+
+      const heroSection = document.getElementById(heroId);
+      if (!heroSection) {
+        setIsScrolled(window.scrollY > 12);
+        return;
+      }
+
+      const threshold = Math.max(heroSection.offsetHeight - NAVBAR_HEIGHT, 12);
+      setIsScrolled(window.scrollY > threshold);
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
+  }, [pathname]);
+
   const closeMenu = () => setIsOpen(false);
 
   return (
-    <header className="fixed top-0 z-50 w-full border-b border-slate-200 bg-white">
+    <header
+      className={`fixed top-0 z-50 w-full border-b transition-all duration-300 ${
+        isOverlayMode
+          ? "border-white/30 bg-transparent"
+          : "border-slate-200 bg-white shadow-sm"
+      }`}
+    >
       <nav className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center" aria-label="Home">
           <Image
-            src="/logo.jpg"
+            src="/logo-removebg-preview.png"
             alt="Hasnat.Dev logo"
             width={44}
             height={44}
-            className="h-11 w-11 rounded-full object-cover"
+            className="h-11 w-auto object-contain"
             priority
           />
         </Link>
@@ -70,8 +125,8 @@ export default function Navbar() {
               aria-current={isActivePath(item.href) ? "page" : undefined}
               className={
                 isActivePath(item.href)
-                  ? "text-violet-700 transition"
-                  : "text-slate-600 transition hover:text-slate-900"
+                  ? activeLinkClass
+                  : navLinkClass
               }
             >
               {item.label}
@@ -90,7 +145,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => setIsOpen((prev) => !prev)}
-            className="flex h-10 w-10 items-center justify-center rounded-md border border-slate-300 text-slate-700 transition hover:border-slate-900 hover:text-slate-900 md:hidden"
+            className={`flex h-10 w-10 items-center justify-center rounded-md border transition md:hidden ${menuButtonClass}`}
             aria-label={isOpen ? "Close menu" : "Open menu"}
             aria-expanded={isOpen}
             aria-controls="mobile-menu"

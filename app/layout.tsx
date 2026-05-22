@@ -110,11 +110,11 @@ export default function RootLayout({
             <div className="space-y-3 text-left">
               <div className="flex items-center justify-start gap-2">
                 <Image
-                  src="/logo.jpg"
+                  src="/logo-removebg-preview.png"
                   alt="Hasnat.Dev logo"
                   width={52}
                   height={52}
-                  className="h-[52px] w-[52px] rounded-full object-cover"
+                  className="h-[52px] w-auto object-contain"
                 />
               </div>
               <p>

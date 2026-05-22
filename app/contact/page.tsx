@@ -102,7 +102,7 @@ export default function ContactPage() {
 
   return (
     <>
-      <section id="contact" aria-label="Contact banner" className="w-full bg-white">
+      <section id="contact" aria-label="Contact banner" className="-mt-16 w-full bg-white pt-16">
         <div className="relative overflow-hidden bg-white">
           <Image
             src="/Banner.jpeg"

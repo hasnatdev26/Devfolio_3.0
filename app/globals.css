@@ -74,16 +74,6 @@ body {
   animation: heroTyping 8s steps(20, end) infinite, heroCursorBlink 1s step-end infinite;
 }
 
-@media (max-width: 640px) {
-  .typewriter-text {
-    width: 100%;
-    max-width: 100%;
-    white-space: normal;
-    border-right: 0;
-    animation: none;
-  }
-}
-
 @keyframes bannerBgMove {
   0% {
     background-position: 50% 50%;

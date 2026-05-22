@@ -25,7 +25,7 @@ export default function FloatingContactButtons() {
         type="button"
         onClick={handleLiveChatClick}
         aria-label="Open live chat"
-        className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-sky-500 text-white shadow-[0_10px_24px_rgba(14,165,233,0.45)] transition hover:scale-105 hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+        className="inline-flex h-16 w-16 animate-bounce items-center justify-center rounded-full bg-sky-500 text-white shadow-[0_10px_24px_rgba(14,165,233,0.45)] transition hover:scale-105 hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 [animation-duration:1.4s]"
       >
         <FaComments className="text-3xl" />
       </button>

@@ -108,7 +108,7 @@ export default function AboutPage() {
 
   return (
     <>
-      <section id="about" aria-label="About" className="w-full bg-white">
+      <section id="about" aria-label="About" className="-mt-16 w-full bg-white pt-16">
         <div className="relative overflow-hidden bg-white">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -388,6 +388,21 @@ export default function AboutPage() {
                 </p>
                 </article>
               </ScrollReplayAnimation>
+
+              <ScrollReplayAnimation animationClass="animate__backInDown" delayMs={360}>
+                <article className="relative rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-md sm:p-6">
+                <span className="absolute -left-[23px] top-7 h-3.5 w-3.5 rounded-full border-2 border-white bg-violet-600 sm:-left-[30px] sm:top-8" />
+                <p className="inline-flex rounded-full bg-violet-700 px-3 py-1 text-xs font-semibold text-white">
+                  2025
+                </p>
+                <h3 className="mt-3 text-lg font-semibold text-slate-900 sm:text-xl">MERN Stack Internship</h3>
+                <p className="mt-1 font-medium text-violet-700">Moulik Solutions</p>
+                <p className="mt-3 text-sm leading-6 text-slate-600 sm:text-base sm:leading-7">
+                  Successfully completed a MERN Stack Internship at Moulik Solutions, gaining hands-on
+                  experience in modern full-stack web application development.
+                </p>
+                </article>
+              </ScrollReplayAnimation>
             </div>
 
             <ScrollReplayAnimation animationClass="animate__backInRight" delayMs={220}>
@@ -409,6 +424,107 @@ export default function AboutPage() {
                 View Resume
               </a>
               </aside>
+            </ScrollReplayAnimation>
+          </div>
+        </div>
+      </section>
+
+      <section aria-label="Professional experience" className="bg-white">
+        <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+          <div className="max-w-3xl space-y-4 sm:space-y-6">
+            <ScrollReplayAnimation animationClass="animate__backInDown" delayMs={0}>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700 sm:text-sm sm:tracking-[0.2em]">
+                Experience
+              </p>
+            </ScrollReplayAnimation>
+            <ScrollReplayAnimation animationClass="animate__backInLeft" delayMs={120}>
+              <h2 className="text-2xl font-bold leading-tight text-slate-900 sm:text-4xl lg:text-5xl">
+                Professional
+                <span> Experience</span>
+              </h2>
+            </ScrollReplayAnimation>
+            <ScrollReplayAnimation animationClass="animate__backInRight" delayMs={220}>
+              <p className="max-w-2xl text-sm leading-7 text-slate-600 sm:text-lg sm:leading-8">
+                My professional journey includes internship and junior developer roles where I worked on
+                modern MERN stack applications, responsive interfaces, API integration, and performance
+                improvements for real-world products.
+              </p>
+            </ScrollReplayAnimation>
+          </div>
+
+          <div className="mt-8 grid items-stretch gap-5 sm:mt-10 sm:gap-6 lg:grid-cols-2">
+            <ScrollReplayAnimation animationClass="animate__backInLeft" delayMs={80}>
+              <div className="h-full">
+                <article className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-md sm:p-6 lg:min-h-[506px]">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <p className="inline-flex rounded-full bg-violet-700 px-3 py-1 text-xs font-semibold text-white">
+                      2025
+                    </p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-700 sm:text-sm">
+                      Internship
+                    </p>
+                  </div>
+                  <h3 className="mt-4 text-lg font-semibold text-slate-900 sm:text-xl">MERN Stack Internship</h3>
+                  <p className="mt-1 font-medium text-violet-700">Moulik Solutions, Chittagong</p>
+                  <div className="mt-4 space-y-3 text-sm leading-7 text-slate-600 sm:text-base">
+                    <p>
+                      Successfully completed a MERN Stack Internship at Moulik Solutions in 2025, gaining
+                      hands-on experience with real-world full-stack web application tasks.
+                    </p>
+                  <p>
+                    Worked with MongoDB, Express.js, React, and Node.js on responsive interfaces, feature
+                    updates, API communication, and bug fixing while improving code quality and teamwork.
+                  </p>
+                  <p>
+                    This experience strengthened my understanding of professional workflow, practical
+                    problem-solving, team collaboration, and building maintainable MERN stack applications in
+                    a structured development environment.
+                  </p>
+                  <p>
+                    It also improved my confidence in contributing effectively within a collaborative
+                    development team.
+                  </p>
+                </div>
+                </article>
+              </div>
+            </ScrollReplayAnimation>
+
+            <ScrollReplayAnimation animationClass="animate__backInRight" delayMs={180}>
+              <div className="h-full">
+                <article className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-md sm:p-6 lg:min-h-[506px]">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <p className="inline-flex rounded-full bg-violet-700 px-3 py-1 text-xs font-semibold text-white">
+                      1 Year
+                    </p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-700 sm:text-sm">
+                      Professional Role
+                    </p>
+                  </div>
+                  <h3 className="mt-4 text-lg font-semibold text-slate-900 sm:text-xl">Junior MERN Stack Developer</h3>
+                  <p className="mt-1 font-medium text-violet-700">CodeZyne, Dhaka</p>
+                  <div className="mt-4 space-y-3 text-sm leading-7 text-slate-600 sm:text-base">
+                  <p>
+                    Developed and maintained scalable web applications using the MERN stack
+                    (MongoDB, Express.js, React, Node.js).
+                  </p>
+                  <p>
+                    Designed responsive, user-friendly interfaces and integrated RESTful APIs for seamless
+                    communication between frontend and backend.
+                  </p>
+                  <p>
+                    Collaborated with cross-functional teams to deliver efficient and high-quality solutions.
+                  </p>
+                    <p>
+                      Identified, debugged, and resolved issues to improve application performance and user
+                      experience.
+                    </p>
+                    <p>
+                      This role also strengthened my ability to work in team-based environments, manage evolving
+                      project needs, and deliver reliable solutions with greater efficiency.
+                    </p>
+                  </div>
+                </article>
+              </div>
             </ScrollReplayAnimation>
           </div>
         </div>

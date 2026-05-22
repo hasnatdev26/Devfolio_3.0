@@ -463,7 +463,7 @@ export default function Home() {
     <>
       <div
         id="home"
-        className="relative flex flex-1 font-sans animate-banner-bg"
+        className="relative -mt-16 flex min-h-screen flex-1 animate-banner-bg font-sans pt-16"
         style={{
           backgroundImage: "url('/Banner.jpeg')",
           backgroundSize: "cover",

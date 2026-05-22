@@ -83,7 +83,7 @@ export default function ProjectsPage() {
 
   return (
     <>
-      <section id="projects" aria-label="Projects banner" className="w-full bg-white">
+      <section id="projects" aria-label="Projects banner" className="-mt-16 w-full bg-white pt-16">
         <div className="relative overflow-hidden bg-white">
           <Image
             src="/Banner.jpeg"
