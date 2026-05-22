@@ -13,13 +13,6 @@ const navItems = [
 ] as const;
 
 const overlayRoutes = new Set(["/", "/projects", "/about", "/contact"]);
-const overlayHeroIds: Record<string, string> = {
-  "/": "home",
-  "/projects": "projects",
-  "/about": "about",
-  "/contact": "contact",
-};
-const NAVBAR_HEIGHT = 64;
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -67,22 +60,8 @@ export default function Navbar() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-
-    const heroId = overlayHeroIds[pathname];
     const handleScroll = () => {
-      if (!heroId) {
-        setIsScrolled(window.scrollY > 12);
-        return;
-      }
-
-      const heroSection = document.getElementById(heroId);
-      if (!heroSection) {
-        setIsScrolled(window.scrollY > 12);
-        return;
-      }
-
-      const threshold = Math.max(heroSection.offsetHeight - NAVBAR_HEIGHT, 12);
-      setIsScrolled(window.scrollY > threshold);
+      setIsScrolled(window.scrollY > 0);
     };
 
     handleScroll();
