@@ -3,21 +3,25 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+const SECRET_DASHBOARD_PATH = "/hasnat-secret-dashboard-01814197707";
+
 const dashboardLinks = [
-  { label: "Overview", href: "/dashboard" },
-  { label: "Profile", href: "/dashboard/profile" },
-  { label: "Projects", href: "/dashboard/projects" },
-  { label: "Messages", href: "/dashboard/messages" },
-  { label: "Email Signups", href: "/dashboard/email-signups" },
-  { label: "Settings", href: "/dashboard/settings" },
+  { label: "Overview", href: SECRET_DASHBOARD_PATH },
+  { label: "Profile", href: `${SECRET_DASHBOARD_PATH}/profile` },
+  { label: "Projects", href: `${SECRET_DASHBOARD_PATH}/projects` },
+  { label: "Messages", href: `${SECRET_DASHBOARD_PATH}/messages` },
+  { label: "Email Signups", href: `${SECRET_DASHBOARD_PATH}/email-signups` },
+  { label: "Settings", href: `${SECRET_DASHBOARD_PATH}/settings` },
 ] as const;
 
 export default function DashboardSidebar() {
   const pathname = usePathname();
+  const normalizedPath = pathname.replace(SECRET_DASHBOARD_PATH, "/dashboard");
 
   const isActive = (href: string) => {
-    if (href === "/dashboard") return pathname === "/dashboard";
-    return pathname === href || pathname.startsWith(`${href}/`);
+    const normalizedHref = href.replace(SECRET_DASHBOARD_PATH, "/dashboard");
+    if (normalizedHref === "/dashboard") return normalizedPath === "/dashboard";
+    return normalizedPath === normalizedHref || normalizedPath.startsWith(`${normalizedHref}/`);
   };
 
   return (

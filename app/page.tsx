@@ -220,6 +220,7 @@ type LiveChatItem = {
   _id?: string;
   message: string;
   adminReply?: string;
+  quotedMessage?: string;
   createdAt?: string;
   repliedAt?: string;
   sender?: "visitor" | "admin";
@@ -282,6 +283,7 @@ export default function Home() {
   const [chatMessage, setChatMessage] = useState("");
   const [chatStatus, setChatStatus] = useState("");
   const [isChatSubmitting, setIsChatSubmitting] = useState(false);
+  const [selectedQuoteId, setSelectedQuoteId] = useState("");
   const [chatHistory, setChatHistory] = useState<LiveChatItem[]>(() => {
     if (typeof window === "undefined") return [];
     const saved = window.localStorage.getItem("live_chat_history");
@@ -366,6 +368,7 @@ export default function Home() {
               _id?: string;
               message?: string;
               adminReply?: string;
+              quotedMessage?: string;
               createdAt?: string;
               repliedAt?: string;
               sender?: "visitor" | "admin";
@@ -373,6 +376,7 @@ export default function Home() {
               _id: item._id,
               message: item.message || "",
               adminReply: item.adminReply || "",
+              quotedMessage: item.quotedMessage || "",
               createdAt: item.createdAt || "",
               repliedAt: item.repliedAt || "",
               sender: item.sender === "admin" ? "admin" : "visitor",
@@ -411,8 +415,12 @@ export default function Home() {
 
   const handleLiveChatSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const trimmedMessage = chatMessage.trim();
+    if (!trimmedMessage) return;
     setChatStatus("");
     setIsChatSubmitting(true);
+    const selectedQuotedMessage =
+      chatHistory.find((item) => (item._id || "") === selectedQuoteId)?.message || "";
 
     try {
       const res = await fetch("/api/messages", {
@@ -421,7 +429,8 @@ export default function Home() {
         body: JSON.stringify({
           name: "Website Visitor",
           email: "visitor@local.chat",
-          message: chatMessage,
+          message: trimmedMessage,
+          quotedMessage: selectedQuotedMessage,
           visitorId,
         }),
       });
@@ -430,6 +439,7 @@ export default function Home() {
 
       setChatStatus("Message sent successfully.");
       setChatMessage("");
+      setSelectedQuoteId("");
       await loadChatThread();
     } catch (error) {
       setChatStatus(error instanceof Error ? error.message : "Failed to send message.");
@@ -458,6 +468,9 @@ export default function Home() {
     window.addEventListener("open-live-chat", openChat);
     return () => window.removeEventListener("open-live-chat", openChat);
   }, []);
+
+  const selectedQuotedMessageText =
+    chatHistory.find((item) => (item._id || "") === selectedQuoteId)?.message || "";
 
   return (
     <>
@@ -828,9 +841,23 @@ export default function Home() {
                       {item.sender === "admin" ? (
                         <div className="flex justify-start">
                           <div className="max-w-[85%]">
-                            <p className="rounded-2xl rounded-bl-sm bg-white px-3 py-2 text-xs leading-5 text-slate-700 shadow-sm ring-1 ring-slate-200">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedQuoteId(item._id || "")}
+                              className={
+                                selectedQuoteId === (item._id || "")
+                                  ? "w-full rounded-2xl rounded-bl-sm border border-violet-300 bg-violet-50 px-3 py-2 text-left text-xs leading-5 text-slate-800 shadow-sm"
+                                  : "w-full rounded-2xl rounded-bl-sm bg-white px-3 py-2 text-left text-xs leading-5 text-slate-700 shadow-sm ring-1 ring-slate-200"
+                              }
+                              title="Click to quote this message"
+                            >
+                              {item.quotedMessage ? (
+                                <span className="mb-2 block rounded-md border-l-2 border-slate-300 bg-slate-100 px-2 py-1 text-[11px] text-slate-600">
+                                  {item.quotedMessage}
+                                </span>
+                              ) : null}
                               {item.message}
-                            </p>
+                            </button>
                             <p className="mt-1 text-[10px] text-slate-500">
                               {formatChatTime(item.createdAt)}
                             </p>
@@ -839,9 +866,23 @@ export default function Home() {
                       ) : (
                         <div className="flex justify-end">
                           <div className="max-w-[85%]">
-                            <p className="rounded-2xl rounded-br-sm bg-sky-500 px-3 py-2 text-xs leading-5 text-white shadow-sm">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedQuoteId(item._id || "")}
+                              className={
+                                selectedQuoteId === (item._id || "")
+                                  ? "w-full rounded-2xl rounded-br-sm border border-sky-300 bg-sky-600 px-3 py-2 text-left text-xs leading-5 text-white shadow-sm"
+                                  : "w-full rounded-2xl rounded-br-sm bg-sky-500 px-3 py-2 text-left text-xs leading-5 text-white shadow-sm"
+                              }
+                              title="Click to quote this message"
+                            >
+                              {item.quotedMessage ? (
+                                <span className="mb-2 block rounded-md border-l-2 border-sky-200 bg-sky-400 px-2 py-1 text-[11px] text-sky-50">
+                                  {item.quotedMessage}
+                                </span>
+                              ) : null}
                               {item.message}
-                            </p>
+                            </button>
                             <p className="mt-1 text-right text-[10px] text-slate-500">
                               {formatChatTime(item.createdAt)}
                             </p>
@@ -866,6 +907,19 @@ export default function Home() {
               </div>
             </div>
             <form onSubmit={handleLiveChatSubmit} className="mt-4 space-y-3">
+              {selectedQuotedMessageText ? (
+                <div className="rounded-md border border-sky-200 bg-sky-50 px-3 py-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-sky-700">Quoted Reply</p>
+                  <p className="mt-1 text-xs text-sky-900">{selectedQuotedMessageText}</p>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedQuoteId("")}
+                    className="mt-2 text-xs font-semibold text-sky-700 hover:text-sky-900"
+                  >
+                    Clear Quote
+                  </button>
+                </div>
+              ) : null}
               <textarea
                 rows={4}
                 value={chatMessage}

@@ -4,6 +4,9 @@ import { ObjectId } from "mongodb";
 import { sendLiveChatNotificationEmail, sendVisitorReplyEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
+const AUTO_REPLY_TEXT =
+  process.env.LIVE_CHAT_AUTO_REPLY?.trim() ||
+  "Hi! Thanks for your message. I received it and will get back to you soon.";
 
 type MessagePayload = {
   name: string;
@@ -15,6 +18,7 @@ type MessagePayload = {
   sender?: "visitor" | "admin";
   recipientEmail?: string;
   recipientName?: string;
+  quotedMessage?: string;
 };
 
 type ReplyPayload = {
@@ -62,6 +66,7 @@ export async function POST(req: Request) {
     const sender = body.sender === "admin" ? "admin" : "visitor";
     const recipientEmail = body.recipientEmail?.trim();
     const recipientName = body.recipientName?.trim();
+    const quotedMessage = body.quotedMessage?.trim();
 
     if (!name || !email || !message) {
       return NextResponse.json(
@@ -79,6 +84,7 @@ export async function POST(req: Request) {
       message,
       visitorId,
       sender,
+      quotedMessage: quotedMessage || "",
       status: sender === "admin" ? "replied" : "new",
       seenByAdmin: sender === "admin",
       createdAt: new Date(),
@@ -93,6 +99,27 @@ export async function POST(req: Request) {
       }).catch(() => {
         // ignore email errors so chat submission always succeeds
       });
+
+      const visitorFilter = visitorId ? { visitorId } : { email, name };
+      const visitorMessageCount = await db.collection("messages").countDocuments({
+        ...visitorFilter,
+        sender: "visitor",
+      });
+
+      if (visitorMessageCount === 1) {
+        await db.collection("messages").insertOne({
+          name: "Hasnat Evan",
+          email: "admin@local.chat",
+          phone: "",
+          subject: "Auto Reply",
+          message: AUTO_REPLY_TEXT,
+          visitorId,
+          sender: "admin",
+          status: "replied",
+          seenByAdmin: true,
+          createdAt: new Date(),
+        });
+      }
     }
 
     if (sender === "admin" && recipientEmail) {
