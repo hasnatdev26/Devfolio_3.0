@@ -1,29 +1,60 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import {
+  getDashboardSecretPath,
+  isDashboardAuthConfigured,
+  isDashboardSecretPath,
+} from "@/lib/dashboard-auth-config";
+import { isDashboardRequestAuthenticated } from "@/lib/dashboard-auth-edge";
 
-const SECRET_DASHBOARD_PATH = "/hasnat-secret-dashboard-01814197707";
+function notFound() {
+  return new NextResponse(null, { status: 404 });
+}
 
-export function middleware(request: NextRequest) {
+function shouldHandlePath(pathname: string) {
+  if (pathname === "/dashboard" || pathname.startsWith("/dashboard/")) return true;
+  return isDashboardSecretPath(pathname);
+}
+
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname === SECRET_DASHBOARD_PATH || pathname.startsWith(`${SECRET_DASHBOARD_PATH}/`)) {
-    const url = request.nextUrl.clone();
-    url.pathname = pathname.replace(SECRET_DASHBOARD_PATH, "/dashboard");
-    return NextResponse.rewrite(url);
+  if (!shouldHandlePath(pathname)) {
+    return NextResponse.next();
+  }
+
+  const secretPath = getDashboardSecretPath();
+  const isAuthenticated = await isDashboardRequestAuthenticated(request.headers.get("cookie"));
+
+  if (pathname === "/dashboard/login") {
+    return notFound();
   }
 
   if (pathname === "/dashboard" || pathname.startsWith("/dashboard/")) {
-    return NextResponse.redirect(new URL("/", request.url));
+    return notFound();
   }
 
-  return NextResponse.next();
+  if (!secretPath || !isDashboardAuthConfigured()) {
+    return notFound();
+  }
+
+  if (!isAuthenticated) {
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("x-dashboard-view", "login");
+    return NextResponse.rewrite(new URL("/dashboard/login", request.url), {
+      request: { headers: requestHeaders },
+    });
+  }
+
+  const internalPath = pathname.replace(secretPath, "/dashboard") || "/dashboard";
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-dashboard-view", "app");
+  requestHeaders.set("x-dashboard-base", secretPath);
+  const rewriteUrl = request.nextUrl.clone();
+  rewriteUrl.pathname = internalPath;
+  return NextResponse.rewrite(rewriteUrl, { request: { headers: requestHeaders } });
 }
 
 export const config = {
-  matcher: [
-    "/dashboard",
-    "/dashboard/:path*",
-    "/hasnat-secret-dashboard-01814197707",
-    "/hasnat-secret-dashboard-01814197707/:path*",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\..*).*)"],
 };

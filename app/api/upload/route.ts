@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { requireDashboardSession } from "@/lib/dashboard-auth";
 
 function isLikelyImageFile(file: File) {
   if (file.type && file.type.startsWith("image/")) return true;
@@ -9,6 +10,9 @@ function isLikelyImageFile(file: File) {
 }
 
 export async function POST(req: Request) {
+  const authError = await requireDashboardSession();
+  if (authError) return authError;
+
   try {
     const formData = await req.formData();
     const file = formData.get("file");

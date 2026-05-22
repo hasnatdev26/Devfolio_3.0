@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requireDashboardSession } from "@/lib/dashboard-auth";
 import { getDb } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { sendLiveChatNotificationEmail, sendVisitorReplyEmail } from "@/lib/email";
@@ -34,9 +35,15 @@ type MarkSeenPayload = {
 };
 
 export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const visitorId = searchParams.get("visitorId")?.trim();
+
+  if (!visitorId) {
+    const authError = await requireDashboardSession();
+    if (authError) return authError;
+  }
+
   try {
-    const { searchParams } = new URL(req.url);
-    const visitorId = searchParams.get("visitorId")?.trim();
     const db = await getDb();
     const messages = await db
       .collection("messages")
@@ -64,6 +71,12 @@ export async function POST(req: Request) {
     const message = body.message?.trim();
     const visitorId = body.visitorId?.trim();
     const sender = body.sender === "admin" ? "admin" : "visitor";
+
+    if (sender === "admin") {
+      const authError = await requireDashboardSession();
+      if (authError) return authError;
+    }
+
     const recipientEmail = body.recipientEmail?.trim();
     const recipientName = body.recipientName?.trim();
     const quotedMessage = body.quotedMessage?.trim();
@@ -149,6 +162,9 @@ export async function POST(req: Request) {
 }
 
 export async function PATCH(req: Request) {
+  const authError = await requireDashboardSession();
+  if (authError) return authError;
+
   try {
     const body = (await req.json()) as Partial<ReplyPayload & MarkSeenPayload>;
     const id = body.id?.trim();
@@ -226,6 +242,9 @@ export async function PATCH(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+  const authError = await requireDashboardSession();
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(req.url);
     const visitorId = searchParams.get("visitorId")?.trim();

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
+import { requireDashboardSession } from "@/lib/dashboard-auth";
 import { getDb } from "@/lib/mongodb";
 
 type Params = {
@@ -9,6 +10,9 @@ type Params = {
 };
 
 export async function DELETE(_: Request, { params }: Params) {
+  const authError = await requireDashboardSession();
+  if (authError) return authError;
+
   try {
     const { id } = await params;
     if (!ObjectId.isValid(id)) {

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requireDashboardSession } from "@/lib/dashboard-auth";
 import { getDb } from "@/lib/mongodb";
 
 function isValidEmail(email: string) {
@@ -6,6 +7,9 @@ function isValidEmail(email: string) {
 }
 
 export async function GET() {
+  const authError = await requireDashboardSession();
+  if (authError) return authError;
+
   try {
     const db = await getDb();
     const signups = await db

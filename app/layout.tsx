@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Poppins } from "next/font/google";
 import Image from "next/image";
 import Navbar from "./Navbar";
@@ -90,21 +91,25 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const isDashboardLogin = headersList.get("x-dashboard-view") === "login";
+
   return (
     <html
       lang="en"
       className={`${poppins.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-white text-slate-900">
-        <ScrollProgress />
-        <Navbar />
-        <FloatingContactButtons />
-        <main className="flex-1 pt-16">{children}</main>
+        {!isDashboardLogin ? <ScrollProgress /> : null}
+        {!isDashboardLogin ? <Navbar /> : null}
+        {!isDashboardLogin ? <FloatingContactButtons /> : null}
+        <main className={isDashboardLogin ? "flex-1" : "flex-1 pt-16"}>{children}</main>
+        {!isDashboardLogin ? (
         <footer className="border-t border-slate-200 bg-white">
           <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-10 text-sm text-slate-600 sm:px-6 md:grid-cols-2 lg:grid-cols-3 lg:px-8">
             <div className="space-y-3 text-left">
@@ -158,6 +163,7 @@ export default function RootLayout({
             </p>
           </div>
         </footer>
+        ) : null}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

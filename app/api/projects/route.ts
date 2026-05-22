@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
+import { requireDashboardSession } from "@/lib/dashboard-auth";
 import { getDb } from "@/lib/mongodb";
 
 type ProjectPayload = {
@@ -48,6 +49,9 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const authError = await requireDashboardSession();
+  if (authError) return authError;
+
   try {
     const body = (await req.json()) as Partial<ProjectPayload>;
     const imageUrl = body.imageUrl?.trim();
@@ -89,6 +93,9 @@ export async function POST(req: Request) {
 }
 
 export async function PATCH(req: Request) {
+  const authError = await requireDashboardSession();
+  if (authError) return authError;
+
   try {
     const body = (await req.json()) as Partial<ReorderPayload>;
     const orderedIds = Array.isArray(body.orderedIds) ? body.orderedIds : [];
