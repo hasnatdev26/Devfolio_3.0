@@ -238,7 +238,42 @@ export default function DashboardMessagesPage() {
       </div>
 
       {loading ? (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-slate-600">Loading messages...</div>
+        <div className="grid gap-4 xl:grid-cols-[300px_1fr]" aria-hidden="true">
+          <aside className="rounded-xl border border-slate-200 bg-white p-3">
+            <div className="skeleton-shimmer relative mb-3 h-3 w-20 rounded bg-slate-200" />
+            <div className="space-y-2">
+              {[1, 2, 3, 4].map((item) => (
+                <div key={item} className="rounded-lg border border-slate-200 p-3">
+                  <div className="skeleton-shimmer relative h-3 w-2/3 rounded bg-slate-200" />
+                  <div className="mt-2 skeleton-shimmer relative h-3 w-full rounded bg-slate-200" />
+                  <div className="mt-2 skeleton-shimmer relative h-3 w-3/4 rounded bg-slate-200" />
+                </div>
+              ))}
+            </div>
+          </aside>
+          <section className="rounded-xl border border-slate-200 bg-white p-4">
+            <div className="mb-4 border-b border-slate-200 pb-3">
+              <div className="skeleton-shimmer relative h-4 w-40 rounded bg-slate-200" />
+              <div className="mt-2 skeleton-shimmer relative h-3 w-56 rounded bg-slate-200" />
+            </div>
+            <div className="space-y-3">
+              <div className="flex justify-start">
+                <div className="skeleton-shimmer relative h-14 w-[70%] rounded-2xl rounded-bl-sm bg-slate-200" />
+              </div>
+              <div className="flex justify-end">
+                <div className="skeleton-shimmer relative h-14 w-[65%] rounded-2xl rounded-br-sm bg-slate-200" />
+              </div>
+              <div className="flex justify-start">
+                <div className="skeleton-shimmer relative h-12 w-[58%] rounded-2xl rounded-bl-sm bg-slate-200" />
+              </div>
+            </div>
+            <div className="mt-5 border-t border-slate-200 pt-3">
+              <div className="skeleton-shimmer relative h-3 w-16 rounded bg-slate-200" />
+              <div className="mt-2 skeleton-shimmer relative h-24 w-full rounded-md bg-slate-200" />
+              <div className="mt-3 skeleton-shimmer relative h-9 w-28 rounded-md bg-slate-200" />
+            </div>
+          </section>
+        </div>
       ) : messages.length === 0 ? (
         <div className="rounded-xl border border-slate-200 bg-white p-4 text-slate-600">No messages found.</div>
       ) : (

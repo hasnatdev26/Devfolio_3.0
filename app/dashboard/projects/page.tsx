@@ -29,6 +29,7 @@ export default function DashboardProjectsPage() {
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dropTargetId, setDropTargetId] = useState<string | null>(null);
   const [isTouchDragging, setIsTouchDragging] = useState(false);
+  const skeletonCards = [1, 2, 3];
 
   const loadProjects = async () => {
     try {
@@ -264,7 +265,18 @@ export default function DashboardProjectsPage() {
       <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8">
         <h2 className="text-xl font-semibold text-slate-900">Added Projects</h2>
         <p className="mt-2 text-xs text-slate-500">Desktop: drag and drop. Mobile: press and drag card to reorder. First item will show first on Projects page.</p>
-        {loading ? <p className="mt-4 text-sm text-slate-600">Loading projects...</p> : null}
+        {loading ? (
+          <div className="mt-4 space-y-3 sm:space-y-4" aria-hidden="true">
+            {skeletonCards.map((item) => (
+              <div key={item} className="rounded-xl border border-slate-200 p-4">
+                <div className="skeleton-shimmer relative h-3 w-28 rounded bg-slate-200" />
+                <div className="mt-3 skeleton-shimmer relative h-3 w-full rounded bg-slate-200" />
+                <div className="mt-2 skeleton-shimmer relative h-3 w-11/12 rounded bg-slate-200" />
+                <div className="mt-3 skeleton-shimmer relative h-8 w-20 rounded-md bg-slate-200" />
+              </div>
+            ))}
+          </div>
+        ) : null}
         {!loading && !projects.length ? (
           <p className="mt-4 text-sm text-slate-600">No projects added yet.</p>
         ) : null}

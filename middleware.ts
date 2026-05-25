@@ -19,6 +19,12 @@ function shouldHandlePath(pathname: string) {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  if (pathname === "/hp-9f2c41b8e7d03a6c51e4b2f9") {
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("x-hide-site-chrome", "true");
+    return NextResponse.next({ request: { headers: requestHeaders } });
+  }
+
   if (!shouldHandlePath(pathname)) {
     return NextResponse.next();
   }

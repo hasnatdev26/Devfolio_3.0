@@ -499,7 +499,7 @@ export default function Home() {
                       Hello, I&apos;m
                       <span className="mt-2 block text-white">Hasnat Evan</span>
                       <span className="typewriter-text mt-2 text-xl text-white sm:text-3xl">
-                        MERN Stack Developer
+                        Full-Stack Web Developer
                       </span>
                     </h1>
                   </ScrollReplayItem>

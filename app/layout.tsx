@@ -97,7 +97,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const headersList = await headers();
-  const isDashboardLogin = headersList.get("x-dashboard-view") === "login";
+  const dashboardView = headersList.get("x-dashboard-view");
+  const isDashboardView = dashboardView === "login" || dashboardView === "app";
+  const hideSiteChrome = headersList.get("x-hide-site-chrome") === "true";
+  const shouldShowChrome = !isDashboardView && !hideSiteChrome;
 
   return (
     <html
@@ -105,11 +108,11 @@ export default async function RootLayout({
       className={`${poppins.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-white text-slate-900">
-        {!isDashboardLogin ? <ScrollProgress /> : null}
-        {!isDashboardLogin ? <Navbar /> : null}
-        {!isDashboardLogin ? <FloatingContactButtons /> : null}
-        <main className={isDashboardLogin ? "flex-1" : "flex-1 pt-16"}>{children}</main>
-        {!isDashboardLogin ? (
+        {shouldShowChrome ? <ScrollProgress /> : null}
+        {shouldShowChrome ? <Navbar /> : null}
+        {shouldShowChrome ? <FloatingContactButtons /> : null}
+        <main className={shouldShowChrome ? "flex-1 pt-16" : "flex-1"}>{children}</main>
+        {shouldShowChrome ? (
         <footer className="border-t border-slate-200 bg-white">
           <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-10 text-sm text-slate-600 sm:px-6 md:grid-cols-2 lg:grid-cols-3 lg:px-8">
             <div className="space-y-3 text-left">
