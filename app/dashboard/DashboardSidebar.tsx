@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import { FiChevronRight } from "react-icons/fi";
 
 const dashboardLinks = [
-  { label: "Overview", suffix: "" },
   { label: "Profile", suffix: "/profile" },
   { label: "Projects", suffix: "/projects" },
   { label: "Messages", suffix: "/messages" },
