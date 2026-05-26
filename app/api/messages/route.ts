@@ -75,8 +75,6 @@ export async function POST(req: Request) {
     const message = body.message?.trim();
     const visitorId = body.visitorId?.trim();
     const sender = body.sender === "admin" ? "admin" : "visitor";
-    const name = sender === "admin" ? "Admin" : requestedName;
-    const email = sender === "admin" ? "" : requestedEmail;
 
     if (sender === "admin") {
       const authError = await requireDashboardSession();
@@ -87,12 +85,15 @@ export async function POST(req: Request) {
     const recipientName = body.recipientName?.trim();
     const quotedMessage = body.quotedMessage?.trim();
 
-    if (!message || (sender === "visitor" && (!name || !email))) {
+    if (!message || (sender === "visitor" && (!requestedName || !requestedEmail))) {
       return NextResponse.json(
         { ok: false, message: "name, email and message are required." },
         { status: 400 }
       );
     }
+
+    const name: string = sender === "admin" ? "Admin" : requestedName!;
+    const email: string = sender === "admin" ? "" : requestedEmail!;
 
     const isLiveChatMessage =
       sender === "visitor" &&
