@@ -1,11 +1,9 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function DashboardLoginPage() {
-  const router = useRouter();
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -29,7 +27,8 @@ export default function DashboardLoginPage() {
         return;
       }
 
-      router.refresh();
+      const target = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+      window.location.assign(target);
     } catch {
       setError("Sign in failed. Please try again.");
     } finally {
