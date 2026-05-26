@@ -47,6 +47,12 @@ function formatDateTime(value?: string) {
   });
 }
 
+function isLocalChatIdentity(value?: string) {
+  if (!value) return true;
+  const normalized = value.trim().toLowerCase();
+  return normalized === "admin@local.chat" || normalized === "visitor@local.chat";
+}
+
 export default function DashboardMessagesPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -172,17 +178,25 @@ export default function DashboardMessagesPage() {
   );
 
   const threadsMap = new Map<string, VisitorThread>();
-  for (const msg of messages) {
+  const filteredMessages = messages.filter((msg) => {
+    const isLiveChat = Boolean(msg.visitorId) || (msg.email || "").trim().toLowerCase() === "visitor@local.chat";
+    return isLiveChat;
+  });
+
+  for (const msg of filteredMessages) {
     const key = msg.visitorId || msg.email || msg.name || msg._id;
     const createdMs = msg.createdAt ? new Date(msg.createdAt).getTime() : 0;
+    const safeName =
+      msg.sender === "admin" || msg.name?.trim().toLowerCase() === "admin" ? "Visitor" : msg.name || "Visitor";
+    const safeSubtitle = isLocalChatIdentity(msg.email) ? "" : msg.email || "";
     const existing = threadsMap.get(key);
     if (!existing) {
       threadsMap.set(key, {
         id: key,
-        title: msg.name || "Visitor",
-        subtitle: msg.email || "visitor@local.chat",
+        title: safeName,
+        subtitle: safeSubtitle,
         phone: msg.phone || "",
-        subject: msg.subject || "",
+        subject: msg.sender !== "admin" ? msg.subject || "" : "",
         unread: msg.sender === "admin" || msg.seenByAdmin ? 0 : 1,
         lastMessageAt: createdMs,
         messages: [msg],
@@ -192,10 +206,16 @@ export default function DashboardMessagesPage() {
       });
     } else {
       existing.messages.push(msg);
+      if ((existing.title === "Visitor" || !existing.title) && msg.sender !== "admin" && msg.name) {
+        existing.title = msg.name;
+      }
+      if (!existing.subtitle && !isLocalChatIdentity(msg.email) && msg.email) {
+        existing.subtitle = msg.email;
+      }
       if (!existing.phone && msg.phone) {
         existing.phone = msg.phone;
       }
-      if (!existing.subject && msg.subject) {
+      if (!existing.subject && msg.subject && msg.sender !== "admin") {
         existing.subject = msg.subject;
       }
       existing.unread += msg.sender === "admin" || msg.seenByAdmin ? 0 : 1;
@@ -231,9 +251,6 @@ export default function DashboardMessagesPage() {
       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-6">
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-violet-700">Visitor Messages</p>
         <h1 className="mt-2 text-xl font-bold text-slate-900 sm:text-3xl">Live Chat Inbox</h1>
-        <p className="mt-2 text-sm text-slate-600 sm:text-base">
-          New visitor chat ekhane ashbe. Nicher box theke reply likhe save korte parben.
-        </p>
         {message ? <p className="mt-3 text-sm text-slate-700">{message}</p> : null}
       </div>
 
@@ -274,11 +291,39 @@ export default function DashboardMessagesPage() {
             </div>
           </section>
         </div>
-      ) : messages.length === 0 ? (
+      ) : filteredMessages.length === 0 ? (
         <div className="rounded-xl border border-slate-200 bg-white p-4 text-slate-600">No messages found.</div>
       ) : (
-        <div className="grid gap-4 xl:grid-cols-[300px_1fr]">
-          <aside className="self-start rounded-xl border border-slate-200 bg-white p-3 xl:sticky xl:top-4">
+        <div className="space-y-4">
+          <div className="rounded-xl border border-slate-200 bg-white p-3 xl:hidden">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Visitors</p>
+            <div className="flex gap-3 overflow-x-auto pb-1">
+              {threads.map((thread) => (
+                <button
+                  key={`mobile-${thread.id}`}
+                  type="button"
+                  onClick={() => {
+                    setSelectedVisitorId(thread.id);
+                    setSelectedQuoteMessageId("");
+                  }}
+                  className="shrink-0 text-center"
+                >
+                  <div className="relative mx-auto h-14 w-14 rounded-full p-[2px] bg-gradient-to-br from-fuchsia-500 via-purple-600 to-violet-700">
+                    <div className="flex h-full w-full items-center justify-center rounded-full bg-white text-base font-bold text-slate-800">
+                      {(thread.title || "V").charAt(0).toUpperCase()}
+                    </div>
+                    {thread.unread > 0 && activeVisitorId !== thread.id ? (
+                      <span className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full border-2 border-white bg-emerald-500" />
+                    ) : null}
+                  </div>
+                  <p className="mt-1 max-w-[72px] truncate text-xs font-medium text-slate-700">{thread.title}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-4 xl:grid-cols-[300px_1fr]">
+          <aside className="hidden self-start rounded-xl border border-slate-200 bg-white p-3 xl:sticky xl:top-4 xl:block">
             <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Visitors</p>
             <div className="space-y-2 xl:max-h-[640px] xl:overflow-y-auto xl:pr-1">
               {threads.map((thread) => (
@@ -290,37 +335,46 @@ export default function DashboardMessagesPage() {
                       : "rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50"
                   }
                 >
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedVisitorId(thread.id);
-                      setSelectedQuoteMessageId("");
-                    }}
-                    className="w-full text-left"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-sm font-semibold text-slate-900">{thread.title}</p>
-                      {thread.unread > 0 && activeVisitorId !== thread.id ? (
-                        <span className="rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-bold text-white">
-                          {thread.unread}
-                        </span>
-                      ) : null}
-                    </div>
-                    <p className="mt-1 break-all text-xs text-slate-600">{thread.subtitle}</p>
-                    {thread.phone ? <p className="mt-1 text-xs text-slate-600">Phone: {thread.phone}</p> : null}
-                    {thread.subject ? <p className="mt-1 text-xs text-slate-600">Subject: {thread.subject}</p> : null}
-                    <p className="mt-1 text-[11px] leading-4 text-slate-500">
-                      {thread.lastMessageAt > 0
-                        ? formatDateTime(new Date(thread.lastMessageAt).toISOString())
-                        : ""}
-                    </p>
-                  </button>
-                  <div className="mt-2">
+                  <div className="flex items-start gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedVisitorId(thread.id);
+                        setSelectedQuoteMessageId("");
+                      }}
+                      className="min-w-0 flex-1 text-left"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-500 via-purple-600 to-violet-700 text-sm font-bold text-white">
+                          {(thread.title || "V").charAt(0).toUpperCase()}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="truncate text-sm font-semibold text-slate-900">{thread.title}</p>
+                            {thread.unread > 0 && activeVisitorId !== thread.id ? (
+                              <span className="rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-bold text-white">
+                                {thread.unread}
+                              </span>
+                            ) : null}
+                          </div>
+                          {thread.subtitle ? (
+                            <p className="mt-1 truncate break-all text-xs text-slate-600">{thread.subtitle}</p>
+                          ) : null}
+                          {thread.phone ? <p className="mt-1 truncate text-xs text-slate-600">Phone: {thread.phone}</p> : null}
+                          {thread.subject ? <p className="mt-1 truncate text-xs text-slate-600">Subject: {thread.subject}</p> : null}
+                          <p className="mt-1 text-[11px] leading-4 text-slate-500">
+                            {thread.lastMessageAt > 0
+                              ? formatDateTime(new Date(thread.lastMessageAt).toISOString())
+                              : ""}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
                     <button
                       type="button"
                       onClick={() => deleteVisitorThread(thread)}
                       disabled={deletingVisitorId === thread.id}
-                      className="inline-flex items-center rounded-md border border-red-200 bg-red-50 px-2 py-1 text-xs font-semibold text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex shrink-0 items-center rounded-md border border-red-200 bg-red-50 px-2 py-1 text-xs font-semibold text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {deletingVisitorId === thread.id ? "Deleting..." : "Delete"}
                     </button>
@@ -335,7 +389,7 @@ export default function DashboardMessagesPage() {
               <>
                 <div className="mb-3 border-b border-slate-200 pb-3">
                   <p className="text-base font-semibold text-slate-900">{activeThread.title}</p>
-                  <p className="text-sm text-slate-600">{activeThread.subtitle}</p>
+                  {activeThread.subtitle ? <p className="text-sm text-slate-600">{activeThread.subtitle}</p> : null}
                   {activeThread.phone ? <p className="text-sm text-slate-600">Phone: {activeThread.phone}</p> : null}
                   {activeThread.subject ? <p className="text-sm text-slate-600">Subject: {activeThread.subject}</p> : null}
                 </div>
@@ -437,6 +491,7 @@ export default function DashboardMessagesPage() {
               <p className="text-sm text-slate-600">No visitor selected.</p>
             )}
           </section>
+          </div>
         </div>
       )}
     </div>

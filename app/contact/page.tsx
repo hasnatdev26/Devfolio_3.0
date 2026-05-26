@@ -211,6 +211,7 @@ export default function ContactPage() {
                       name="fullName"
                       type="text"
                       required
+                      autoComplete="name"
                       placeholder="Enter your full name"
                       className="w-full rounded-md border border-slate-300 px-4 py-3 text-slate-900 outline-none transition focus:border-slate-900"
                     />
@@ -226,6 +227,8 @@ export default function ContactPage() {
                       name="email"
                       type="email"
                       required
+                      autoComplete="email"
+                      inputMode="email"
                       placeholder="Enter your email address"
                       className="w-full rounded-md border border-slate-300 px-4 py-3 text-slate-900 outline-none transition focus:border-slate-900"
                     />
@@ -240,6 +243,8 @@ export default function ContactPage() {
                       id="phone-number"
                       name="phone"
                       type="text"
+                      autoComplete="tel"
+                      inputMode="tel"
                       placeholder="Enter your phone number"
                       className="w-full rounded-md border border-slate-300 px-4 py-3 text-slate-900 outline-none transition focus:border-slate-900"
                     />

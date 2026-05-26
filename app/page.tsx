@@ -498,9 +498,7 @@ export default function Home() {
                     <h1 className="text-3xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">
                       Hello, I&apos;m
                       <span className="mt-2 block text-white">Hasnat Evan</span>
-                      <span className="typewriter-text mt-2 text-xl text-white sm:text-3xl">
-                        Full-Stack Web Developer
-                      </span>
+                      <span className="typewriter-text mt-2 text-xl text-white sm:text-3xl">Full-Stack Developer</span>
                     </h1>
                   </ScrollReplayItem>
                   <ScrollReplayItem playId={playId} delayMs={150}>

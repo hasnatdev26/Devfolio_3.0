@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import { requireDashboardSession } from "@/lib/dashboard-auth";
 import { getDb } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
-import { sendLiveChatNotificationEmail, sendVisitorReplyEmail } from "@/lib/email";
+import {
+  sendContactFormEmail,
+  sendLiveChatNotificationEmail,
+  sendVisitorReplyEmail,
+} from "@/lib/email";
 
 export const runtime = "nodejs";
 const AUTO_REPLY_TEXT =
@@ -64,13 +68,15 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as Partial<MessagePayload>;
-    const name = body.name?.trim();
-    const email = body.email?.trim();
+    const requestedName = body.name?.trim();
+    const requestedEmail = body.email?.trim();
     const phone = body.phone?.trim();
     const subject = body.subject?.trim();
     const message = body.message?.trim();
     const visitorId = body.visitorId?.trim();
     const sender = body.sender === "admin" ? "admin" : "visitor";
+    const name = sender === "admin" ? "Admin" : requestedName;
+    const email = sender === "admin" ? "" : requestedEmail;
 
     if (sender === "admin") {
       const authError = await requireDashboardSession();
@@ -81,10 +87,35 @@ export async function POST(req: Request) {
     const recipientName = body.recipientName?.trim();
     const quotedMessage = body.quotedMessage?.trim();
 
-    if (!name || !email || !message) {
+    if (!message || (sender === "visitor" && (!name || !email))) {
       return NextResponse.json(
         { ok: false, message: "name, email and message are required." },
         { status: 400 }
+      );
+    }
+
+    const isLiveChatMessage =
+      sender === "visitor" &&
+      (Boolean(visitorId) || (email || "").trim().toLowerCase() === "visitor@local.chat");
+
+    if (sender === "visitor" && !isLiveChatMessage) {
+      const sent = await sendContactFormEmail({
+        senderName: name,
+        senderEmail: email,
+        phone,
+        subject,
+        message,
+      });
+      if (!sent) {
+        return NextResponse.json(
+          { ok: false, message: "Email service is not configured." },
+          { status: 503 }
+        );
+      }
+
+      return NextResponse.json(
+        { ok: true, message: "Message sent to email successfully." },
+        { status: 201 }
       );
     }
 
@@ -114,22 +145,24 @@ export async function POST(req: Request) {
       });
 
       const visitorFilter = visitorId ? { visitorId } : { email, name };
-      const visitorMessageCount = await db.collection("messages").countDocuments({
+      const alreadyAutoReplied = await db.collection("messages").countDocuments({
         ...visitorFilter,
-        sender: "visitor",
+        sender: "admin",
+        autoReply: true,
       });
 
-      if (visitorMessageCount === 1) {
+      if (alreadyAutoReplied === 0) {
         await db.collection("messages").insertOne({
-          name: "Hasnat Evan",
-          email: "admin@local.chat",
+          name: "Admin",
+          email: "",
           phone: "",
-          subject: "Auto Reply",
+          subject: "",
           message: AUTO_REPLY_TEXT,
           visitorId,
           sender: "admin",
           status: "replied",
           seenByAdmin: true,
+          autoReply: true,
           createdAt: new Date(),
         });
       }

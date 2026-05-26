@@ -12,7 +12,6 @@ const dashboardLinks = [
   { label: "Projects", suffix: "/projects" },
   { label: "Messages", suffix: "/messages" },
   { label: "Email Signups", suffix: "/email-signups" },
-  { label: "Settings", suffix: "/settings" },
 ] as const;
 
 type DashboardSidebarProps = {
