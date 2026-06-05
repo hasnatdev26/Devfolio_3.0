@@ -239,6 +239,10 @@ function formatChatTime(value?: string) {
   });
 }
 
+function createLiveChatVisitorId() {
+  return `v_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+}
+
 function SkillProgress({
   item,
   isActive,
@@ -270,39 +274,17 @@ function SkillProgress({
 export default function Home() {
   const techSectionRef = useRef<HTMLElement | null>(null);
   const chatScrollRef = useRef<HTMLDivElement | null>(null);
+  const hasLoadedBrowserChatRef = useRef(false);
   const [techActive, setTechActive] = useState(false);
   const [links, setLinks] = useState<SiteLinks>(defaultSiteLinks);
-  const [isLiveChatOpen, setIsLiveChatOpen] = useState(() => {
-    if (typeof window === "undefined") return false;
-    const shouldOpen = window.sessionStorage.getItem("open_live_chat_once") === "1";
-    if (shouldOpen) {
-      window.sessionStorage.removeItem("open_live_chat_once");
-    }
-    return shouldOpen;
-  });
+  const [isLiveChatOpen, setIsLiveChatOpen] = useState(false);
   const [chatMessage, setChatMessage] = useState("");
+  const [chatName, setChatName] = useState("");
   const [chatStatus, setChatStatus] = useState("");
   const [isChatSubmitting, setIsChatSubmitting] = useState(false);
   const [selectedQuoteId, setSelectedQuoteId] = useState("");
-  const [chatHistory, setChatHistory] = useState<LiveChatItem[]>(() => {
-    if (typeof window === "undefined") return [];
-    const saved = window.localStorage.getItem("live_chat_history");
-    if (!saved) return [];
-    try {
-      const parsed = JSON.parse(saved) as LiveChatItem[];
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  });
-  const [visitorId] = useState<string>(() => {
-    if (typeof window === "undefined") return "";
-    const existing = window.localStorage.getItem("live_chat_visitor_id");
-    if (existing) return existing;
-    const next = `v_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
-    window.localStorage.setItem("live_chat_visitor_id", next);
-    return next;
-  });
+  const [chatHistory, setChatHistory] = useState<LiveChatItem[]>([]);
+  const [visitorId, setVisitorId] = useState("");
 
   const frontEndSkills: SkillItem[] = [
     { name: "React.js", value: 90 },
@@ -351,8 +333,56 @@ export default function Home() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (!hasLoadedBrowserChatRef.current) return;
     window.localStorage.setItem("live_chat_history", JSON.stringify(chatHistory));
   }, [chatHistory]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!hasLoadedBrowserChatRef.current) return;
+    const trimmedName = chatName.trim();
+    if (trimmedName) {
+      window.localStorage.setItem("live_chat_visitor_name", trimmedName);
+    } else {
+      window.localStorage.removeItem("live_chat_visitor_name");
+    }
+  }, [chatName]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const loadBrowserChatId = window.setTimeout(() => {
+      const savedName = window.localStorage.getItem("live_chat_visitor_name") || "";
+      const savedHistory = window.localStorage.getItem("live_chat_history");
+      const existingVisitorId = window.localStorage.getItem("live_chat_visitor_id");
+      const nextVisitorId = existingVisitorId || createLiveChatVisitorId();
+      const shouldOpen = window.sessionStorage.getItem("open_live_chat_once") === "1";
+
+      if (!existingVisitorId) {
+        window.localStorage.setItem("live_chat_visitor_id", nextVisitorId);
+      }
+      if (shouldOpen) {
+        window.sessionStorage.removeItem("open_live_chat_once");
+      }
+
+      setChatName(savedName);
+      setVisitorId(nextVisitorId);
+      setIsLiveChatOpen(shouldOpen);
+
+      if (savedHistory) {
+        try {
+          const parsed = JSON.parse(savedHistory) as LiveChatItem[];
+          setChatHistory(Array.isArray(parsed) ? parsed : []);
+        } catch {
+          setChatHistory([]);
+        }
+      }
+
+      hasLoadedBrowserChatRef.current = true;
+    }, 0);
+
+    return () => window.clearTimeout(loadBrowserChatId);
+  }, []);
 
   const loadChatThread = useCallback(async () => {
     if (!visitorId) return;
@@ -415,8 +445,16 @@ export default function Home() {
 
   const handleLiveChatSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const trimmedName = chatName.trim();
     const trimmedMessage = chatMessage.trim();
-    if (!trimmedMessage) return;
+    if (!trimmedName) {
+      setChatStatus("Please enter your name before sending a message.");
+      return;
+    }
+    if (!trimmedMessage) {
+      setChatStatus("Please write a message before sending.");
+      return;
+    }
     setChatStatus("");
     setIsChatSubmitting(true);
     const selectedQuotedMessage =
@@ -427,7 +465,7 @@ export default function Home() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: "Website Visitor",
+          name: trimmedName,
           email: "visitor@local.chat",
           message: trimmedMessage,
           quotedMessage: selectedQuotedMessage,
@@ -918,6 +956,21 @@ export default function Home() {
                   </button>
                 </div>
               ) : null}
+              <div>
+                <label htmlFor="live-chat-name" className="mb-1.5 block text-xs font-semibold text-slate-700">
+                  Name
+                </label>
+                <input
+                  id="live-chat-name"
+                  type="text"
+                  value={chatName}
+                  onChange={(e) => setChatName(e.target.value)}
+                  placeholder="Enter your name"
+                  autoComplete="name"
+                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 outline-none focus:border-sky-500"
+                  required
+                />
+              </div>
               <textarea
                 rows={4}
                 value={chatMessage}

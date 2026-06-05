@@ -20,7 +20,18 @@ type VisitorReplyEmailParams = {
   subject?: string;
 };
 
+type SubscriberEmailParams = {
+  recipientEmail: string;
+  subject: string;
+  message: string;
+};
+
 const ADMIN_EMAIL = process.env.NODEMAILER_TO || "hasnat.dev.26@gmail.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || "https://hasnatevan.top";
+const SITE_NAME = "Hasnat Evan";
+const SITE_DOMAIN = SITE_URL.replace(/^https?:\/\//, "").replace(/\/$/, "");
+const SITE_TAGLINE = "Full Stack Web Developer";
+const BRAND_GRADIENT = "linear-gradient(90deg,#d946ef,#9333ea,#6d28d9)";
 
 function hasMailConfig() {
   return Boolean(
@@ -69,9 +80,12 @@ export async function sendLiveChatNotificationEmail(params: LiveChatEmailParams)
       });
 
   const subject = `New visitor message - ${params.senderName}`;
+  const safeName = escapeHtml(params.senderName || "Website Visitor");
   const safeMessage = escapeHtml(params.message || "");
   const text = [
     "A new visitor message arrived from website live chat.",
+    "",
+    `Visitor Name: ${params.senderName || "Website Visitor"}`,
     "",
     "Message:",
     params.message,
@@ -109,6 +123,10 @@ export async function sendLiveChatNotificationEmail(params: LiveChatEmailParams)
                   <p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:#334155;">
                     A new visitor message arrived from website live chat.
                   </p>
+                  <div style="margin-top:16px;padding:14px;border:1px solid #bfdbfe;border-radius:10px;background:#eff6ff;">
+                    <p style="margin:0 0 7px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#2563eb;">Visitor Name</p>
+                    <p style="margin:0;font-size:18px;line-height:1.4;font-weight:700;color:#0f172a;word-break:break-word;">${safeName}</p>
+                  </div>
                   <div class="mail-message" style="margin-top:16px;padding:14px;border:1px solid #dbeafe;border-radius:10px;background:#f8fafc;">
                     <p style="margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#64748b;">Message</p>
                     <p style="margin:0;font-size:15px;line-height:1.7;color:#0f172a;white-space:pre-wrap;word-break:break-word;">${safeMessage}</p>
@@ -183,6 +201,108 @@ export async function sendVisitorReplyEmail(params: VisitorReplyEmailParams) {
     to: params.recipientEmail,
     subject: mailSubject,
     text,
+  });
+
+  return true;
+}
+
+export async function sendSubscriberEmail(params: SubscriberEmailParams) {
+  if (!hasMailConfig()) return false;
+
+  const { default: nodemailer } = await import("nodemailer");
+
+  const host = process.env.NODEMAILER_HOST || process.env.SMTP_HOST;
+  const port = Number(process.env.NODEMAILER_PORT || process.env.SMTP_PORT || 587);
+  const user = process.env.NODEMAILER_USER || process.env.SMTP_USER;
+  const pass = process.env.NODEMAILER_PASS || process.env.SMTP_PASS;
+  const from = process.env.NODEMAILER_FROM || process.env.SMTP_FROM || user;
+  const secure = port === 465;
+
+  const transporter = host
+    ? nodemailer.createTransport({
+        host,
+        port,
+        secure,
+        auth: {
+          user,
+          pass,
+        },
+      })
+    : nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user,
+          pass,
+        },
+      });
+
+  const safeMessage = escapeHtml(params.message || "");
+  const safeSiteName = escapeHtml(SITE_NAME);
+  const safeSiteTagline = escapeHtml(SITE_TAGLINE);
+  const safeSiteDomain = escapeHtml(SITE_DOMAIN);
+  const html = `
+    <div style="margin:0;padding:0;background:#f5f3ff;font-family:Arial,sans-serif;color:#0f172a;">
+      <style>
+        @media only screen and (max-width: 640px) {
+          .mail-shell { padding: 14px !important; }
+          .mail-card { border-radius: 14px !important; }
+          .mail-header { padding: 18px !important; }
+          .mail-header h2 { font-size: 24px !important; }
+          .mail-body { padding: 18px !important; }
+          .mail-body p { font-size: 14px !important; }
+          .mail-message { padding: 12px !important; }
+        }
+        @media only screen and (max-width: 420px) {
+          .mail-shell { padding: 8px !important; }
+          .mail-header h2 { font-size: 21px !important; }
+          .mail-body p { font-size: 13px !important; }
+          .mail-body .mail-tagline { font-size: 13px !important; }
+        }
+      </style>
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="mail-shell" style="padding:28px 14px;">
+        <tr>
+          <td align="center">
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="mail-card" style="max-width:680px;margin:0 auto;background:#ffffff;border:1px solid #e9d5ff;border-radius:18px;overflow:hidden;box-shadow:0 18px 45px rgba(109,40,217,.14);">
+              <tr>
+                <td class="mail-header" style="padding:0;background:${BRAND_GRADIENT};">
+                  <div style="padding:26px 28px;">
+                    <p style="margin:0;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#f5d0fe;font-weight:700;">Portfolio Message</p>
+                    <h2 style="margin:8px 0 0;font-size:30px;line-height:1.22;font-weight:800;color:#ffffff;word-break:break-word;">${safeSiteName}</h2>
+                    <p class="mail-tagline" style="margin:7px 0 0;font-size:14px;line-height:1.55;color:#ede9fe;">${safeSiteTagline}</p>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="mail-body" style="padding:28px;">
+                  <div style="padding:20px;border:1px solid #e9d5ff;border-radius:14px;background:#faf5ff;">
+                    <p style="margin:0;font-size:15px;line-height:1.75;color:#0f172a;white-space:pre-wrap;word-break:break-word;">${safeMessage}</p>
+                  </div>
+                  <div style="margin-top:26px;padding-top:18px;border-top:1px solid #e9d5ff;text-align:center;">
+                    <p style="margin:0;font-size:13px;line-height:1.6;color:#64748b;">Sent from ${safeSiteName}'s portfolio.</p>
+                    <p style="margin:5px 0 0;font-size:13px;line-height:1.6;">
+                      <a href="${SITE_URL}" style="color:#6d28d9;font-weight:700;text-decoration:none;">${safeSiteDomain}</a>
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+  `;
+
+  await transporter.sendMail({
+    from: `"${SITE_NAME}" <${from}>`,
+    to: params.recipientEmail,
+    subject: params.subject,
+    text: [
+      params.message,
+      "",
+      `Sent from ${SITE_NAME}'s portfolio.`,
+      SITE_URL,
+    ].join("\n"),
+    html,
   });
 
   return true;

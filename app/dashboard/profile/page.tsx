@@ -17,6 +17,9 @@ const initialLinksState: SiteLinks = {
   resume: "",
 };
 
+const profileSkeletonRows = [1, 2];
+const linksSkeletonRows = [1, 2, 3, 4];
+
 export default function DashboardProfilePage() {
   const [profileForm, setProfileForm] = useState<AboutProfile>(defaultAboutProfile);
   const [linksForm, setLinksForm] = useState<SiteLinks>(initialLinksState);
@@ -136,6 +139,31 @@ export default function DashboardProfilePage() {
       <p className="text-sm font-semibold uppercase tracking-[0.2em] text-violet-700">Profile</p>
       <h1 className="mt-3 text-2xl font-bold text-slate-900 sm:text-3xl">Profile and Social Media</h1>
 
+      {loading ? (
+        <div className="mt-6 space-y-6" aria-hidden="true">
+          <div className="space-y-5">
+            {profileSkeletonRows.map((item) => (
+              <div key={item} className="space-y-2">
+                <div className="skeleton-shimmer relative h-3 w-36 rounded bg-slate-200" />
+                <div className="skeleton-shimmer relative h-10 w-full rounded-md bg-slate-200" />
+                <div className="skeleton-shimmer relative h-3 w-64 max-w-full rounded bg-slate-200" />
+              </div>
+            ))}
+            <div className="skeleton-shimmer relative h-9 w-40 rounded-md bg-slate-200" />
+          </div>
+
+          <div className="h-px w-full bg-slate-200" />
+
+          <div className="space-y-4">
+            <div className="skeleton-shimmer relative h-5 w-52 rounded bg-slate-200" />
+            {linksSkeletonRows.map((item) => (
+              <div key={item} className="skeleton-shimmer relative h-10 w-full rounded-md bg-slate-200" />
+            ))}
+            <div className="skeleton-shimmer relative h-9 w-40 rounded-md bg-slate-200" />
+          </div>
+        </div>
+      ) : (
+        <>
       <form className="mt-6 space-y-5" onSubmit={onProfileSubmit}>
         <div className="space-y-2">
           <label className="text-sm font-semibold text-slate-700">Upload Cover Photo</label>
@@ -221,6 +249,8 @@ export default function DashboardProfilePage() {
       </form>
 
       {linksMessage ? <p className="mt-3 text-sm text-slate-600">{linksMessage}</p> : null}
+        </>
+      )}
     </div>
   );
 }

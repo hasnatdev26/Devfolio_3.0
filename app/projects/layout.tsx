@@ -6,13 +6,13 @@ export const metadata: Metadata = {
   description:
     "Explore featured projects by Hasnat Evan, including modern full-stack applications built with React, Next.js, Node.js, and MongoDB.",
   alternates: {
-    canonical: "/projects",
+    canonical: "/projects/",
   },
   openGraph: {
     title: "Projects | Hasnat Evan",
     description:
       "Case studies and selected full-stack projects by Hasnat Evan.",
-    url: "https://hasnatevan.top/projects",
+    url: "https://hasnatevan.top/projects/",
     type: "website",
     images: ["/logo.jpg"],
   },

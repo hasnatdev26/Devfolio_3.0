@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { FiSend, FiTrash2 } from "react-icons/fi";
 
 type ChatMessage = {
   _id: string;
@@ -299,25 +300,39 @@ export default function DashboardMessagesPage() {
             <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Visitors</p>
             <div className="flex gap-3 overflow-x-auto pb-1">
               {threads.map((thread) => (
-                <button
+                <div
                   key={`mobile-${thread.id}`}
-                  type="button"
-                  onClick={() => {
-                    setSelectedVisitorId(thread.id);
-                    setSelectedQuoteMessageId("");
-                  }}
-                  className="shrink-0 text-center"
+                  className="relative shrink-0 text-center"
                 >
-                  <div className="relative mx-auto h-14 w-14 rounded-full p-[2px] bg-gradient-to-br from-fuchsia-500 via-purple-600 to-violet-700">
-                    <div className="flex h-full w-full items-center justify-center rounded-full bg-white text-base font-bold text-slate-800">
-                      {(thread.title || "V").charAt(0).toUpperCase()}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedVisitorId(thread.id);
+                      setSelectedQuoteMessageId("");
+                    }}
+                    className="block text-center"
+                  >
+                    <div className="relative mx-auto h-14 w-14 rounded-full bg-gradient-to-br from-fuchsia-500 via-purple-600 to-violet-700 p-[2px]">
+                      <div className="flex h-full w-full items-center justify-center rounded-full bg-white text-base font-bold text-slate-800">
+                        {(thread.title || "V").charAt(0).toUpperCase()}
+                      </div>
+                      {thread.unread > 0 && activeVisitorId !== thread.id ? (
+                        <span className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full border-2 border-white bg-emerald-500" />
+                      ) : null}
                     </div>
-                    {thread.unread > 0 && activeVisitorId !== thread.id ? (
-                      <span className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full border-2 border-white bg-emerald-500" />
-                    ) : null}
-                  </div>
-                  <p className="mt-1 max-w-[72px] truncate text-xs font-medium text-slate-700">{thread.title}</p>
-                </button>
+                    <p className="mt-1 max-w-[72px] truncate text-xs font-medium text-slate-700">{thread.title}</p>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => deleteVisitorThread(thread)}
+                    disabled={deletingVisitorId === thread.id}
+                    className="absolute -right-1 -top-1 inline-flex h-6 w-6 items-center justify-center rounded-full border border-red-200 bg-white text-red-600 shadow-sm hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    aria-label={`Delete conversation for ${thread.title}`}
+                    title="Delete conversation"
+                  >
+                    <FiTrash2 className="h-3.5 w-3.5" aria-hidden />
+                  </button>
+                </div>
               ))}
             </div>
           </div>
@@ -374,9 +389,11 @@ export default function DashboardMessagesPage() {
                       type="button"
                       onClick={() => deleteVisitorThread(thread)}
                       disabled={deletingVisitorId === thread.id}
-                      className="inline-flex shrink-0 items-center rounded-md border border-red-200 bg-red-50 px-2 py-1 text-xs font-semibold text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                      aria-label={`Delete conversation for ${thread.title}`}
+                      title="Delete conversation"
                     >
-                      {deletingVisitorId === thread.id ? "Deleting..." : "Delete"}
+                      <FiTrash2 className="h-4 w-4" aria-hidden />
                     </button>
                   </div>
                 </div>
@@ -388,10 +405,17 @@ export default function DashboardMessagesPage() {
             {activeThread ? (
               <>
                 <div className="mb-3 border-b border-slate-200 pb-3">
-                  <p className="text-base font-semibold text-slate-900">{activeThread.title}</p>
-                  {activeThread.subtitle ? <p className="text-sm text-slate-600">{activeThread.subtitle}</p> : null}
-                  {activeThread.phone ? <p className="text-sm text-slate-600">Phone: {activeThread.phone}</p> : null}
-                  {activeThread.subject ? <p className="text-sm text-slate-600">Subject: {activeThread.subject}</p> : null}
+                  <div className="min-w-0">
+                    <p className="text-base font-semibold text-slate-900">{activeThread.title}</p>
+                    {activeThread.subtitle ? <p className="text-sm text-slate-600">{activeThread.subtitle}</p> : null}
+                    {activeThread.visitorId ? (
+                      <p className="mt-1 break-all text-xs font-medium text-slate-500">
+                        Visitor ID: {activeThread.visitorId}
+                      </p>
+                    ) : null}
+                    {activeThread.phone ? <p className="text-sm text-slate-600">Phone: {activeThread.phone}</p> : null}
+                    {activeThread.subject ? <p className="text-sm text-slate-600">Subject: {activeThread.subject}</p> : null}
+                  </div>
                 </div>
 
                 <div className="mb-4 flex-1 space-y-3 overflow-y-auto pr-1">
@@ -470,21 +494,25 @@ export default function DashboardMessagesPage() {
                     </div>
                   ) : null}
                   <label className="block text-sm font-medium text-slate-700">Reply</label>
-                  <textarea
-                    rows={3}
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-violet-600"
-                    placeholder="Type your reply..."
-                  />
-                  <button
-                    type="button"
-                    onClick={saveReply}
-                    disabled={sendingReply}
-                    className="inline-flex items-center rounded-md border border-violet-400/60 bg-gradient-to-r from-fuchsia-500 via-purple-600 to-violet-700 px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {sendingReply ? "Sending..." : "Send Reply"}
-                  </button>
+                  <div className="flex items-stretch gap-2">
+                    <textarea
+                      rows={2}
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      className="min-w-0 flex-1 rounded-md border border-slate-300 px-3 py-1.5 text-sm leading-5 text-slate-900 outline-none transition focus:border-violet-600"
+                      placeholder="Type your reply..."
+                    />
+                    <button
+                      type="button"
+                      onClick={saveReply}
+                      disabled={sendingReply}
+                      className="inline-flex w-11 shrink-0 items-center justify-center rounded-md text-violet-700 transition hover:text-violet-900 disabled:cursor-not-allowed disabled:opacity-60"
+                      aria-label={sendingReply ? "Sending reply" : "Send reply"}
+                      title={sendingReply ? "Sending..." : "Send reply"}
+                    >
+                      <FiSend className="h-5 w-5" aria-hidden />
+                    </button>
+                  </div>
                 </div>
               </>
             ) : (

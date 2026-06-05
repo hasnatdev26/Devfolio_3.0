@@ -6,13 +6,13 @@ export const metadata: Metadata = {
   description:
     "Learn more about Hasnat Evan, a MERN stack developer focused on scalable architecture, modern UI, and performance-driven web apps.",
   alternates: {
-    canonical: "/about",
+    canonical: "/about/",
   },
   openGraph: {
     title: "About | Hasnat Evan",
     description:
       "Professional background, education, and development journey of Hasnat Evan.",
-    url: "https://hasnatevan.top/about",
+    url: "https://hasnatevan.top/about/",
     type: "profile",
     images: ["/logo.jpg"],
   },

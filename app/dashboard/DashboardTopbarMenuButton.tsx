@@ -11,10 +11,10 @@ export default function DashboardTopbarMenuButton() {
     <button
       type="button"
       onClick={onToggle}
-      className="inline-flex items-center justify-center rounded-lg border border-violet-300 bg-white p-2 text-sm font-semibold text-violet-700 shadow-sm lg:hidden"
+      className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-violet-300 bg-white text-sm font-semibold text-violet-700 shadow-sm lg:hidden"
       aria-label="Toggle dashboard menu"
     >
-      <FiMenu className="h-4 w-4" />
+      <FiMenu className="h-5 w-5" />
     </button>
   );
 }

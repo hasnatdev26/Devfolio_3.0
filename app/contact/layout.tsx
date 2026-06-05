@@ -6,13 +6,13 @@ export const metadata: Metadata = {
   description:
     "Contact Hasnat Evan for freelance MERN stack development, web app maintenance, UI improvements, and full-stack project collaboration.",
   alternates: {
-    canonical: "/contact",
+    canonical: "/contact/",
   },
   openGraph: {
     title: "Contact | Hasnat Evan",
     description:
       "Get in touch with Hasnat Evan for your next web project and technical consultation.",
-    url: "https://hasnatevan.top/contact",
+    url: "https://hasnatevan.top/contact/",
     type: "website",
     images: ["/logo.jpg"],
   },
