@@ -14,6 +14,10 @@ function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error);
+}
+
 export async function POST(req: Request) {
   const authError = await requireDashboardSession();
   if (authError) return authError;
@@ -57,17 +61,33 @@ export async function POST(req: Request) {
 
       let sentCount = 0;
       for (const email of recipientEmails) {
-        const sent = await sendSubscriberEmail({
-          recipientEmail: email,
-          subject,
-          message,
-        });
+        try {
+          const sent = await sendSubscriberEmail({
+            recipientEmail: email,
+            subject,
+            message,
+          });
 
-        if (!sent) {
-          return NextResponse.json({ ok: false, message: "Email config is missing." }, { status: 500 });
+          if (!sent) {
+            return NextResponse.json(
+              { ok: false, message: "Email config is missing. Check NODEMAILER_USER and NODEMAILER_PASS." },
+              { status: 500 }
+            );
+          }
+
+          sentCount += 1;
+        } catch (error) {
+          const errorMessage = getErrorMessage(error);
+          console.error("Failed to send subscriber email to", email, errorMessage);
+          return NextResponse.json(
+            {
+              ok: false,
+              message: `Failed to send email to ${email}. ${errorMessage}`,
+              error: errorMessage,
+            },
+            { status: 500 }
+          );
         }
-
-        sentCount += 1;
       }
 
       return NextResponse.json(
@@ -76,20 +96,38 @@ export async function POST(req: Request) {
       );
     }
 
-    const sent = await sendSubscriberEmail({
-      recipientEmail: recipientEmail!,
-      subject,
-      message,
-    });
+    try {
+      const sent = await sendSubscriberEmail({
+        recipientEmail: recipientEmail!,
+        subject,
+        message,
+      });
 
-    if (!sent) {
-      return NextResponse.json({ ok: false, message: "Email config is missing." }, { status: 500 });
+      if (!sent) {
+        return NextResponse.json(
+          { ok: false, message: "Email config is missing. Check NODEMAILER_USER and NODEMAILER_PASS." },
+          { status: 500 }
+        );
+      }
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      console.error("Failed to send subscriber email to", recipientEmail, errorMessage);
+      return NextResponse.json(
+        {
+          ok: false,
+          message: `Failed to send email to ${recipientEmail}. ${errorMessage}`,
+          error: errorMessage,
+        },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ ok: true, message: "Email sent successfully." }, { status: 200 });
   } catch (error) {
+    const errorMessage = getErrorMessage(error);
+    console.error("Failed to process email signup send request", errorMessage);
     return NextResponse.json(
-      { ok: false, message: "Failed to send email.", error: String(error) },
+      { ok: false, message: "Failed to send email.", error: errorMessage },
       { status: 500 }
     );
   }

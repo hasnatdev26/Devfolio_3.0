@@ -40,6 +40,57 @@ function hasMailConfig() {
   );
 }
 
+function isTruthyEnvValue(value: string | undefined) {
+  if (!value) return false;
+  const normalized = value.trim().toLowerCase();
+  return !["0", "false", "no", "off"].includes(normalized);
+}
+
+async function createMailTransporter() {
+  const { default: nodemailer } = await import("nodemailer");
+
+  const host = process.env.NODEMAILER_HOST || process.env.SMTP_HOST;
+  const user = process.env.NODEMAILER_USER || process.env.SMTP_USER;
+  const pass = process.env.NODEMAILER_PASS || process.env.SMTP_PASS;
+  const resolvedHost = host || (user?.toLowerCase().endsWith("@gmail.com") ? "smtp.gmail.com" : "");
+  const port = Number(
+    process.env.NODEMAILER_PORT ||
+      process.env.SMTP_PORT ||
+      (resolvedHost === "smtp.gmail.com" ? 465 : 587)
+  );
+  const secure =
+    isTruthyEnvValue(process.env.NODEMAILER_SECURE) ||
+    isTruthyEnvValue(process.env.SMTP_SECURE) ||
+    port === 465;
+  const from = process.env.NODEMAILER_FROM || process.env.SMTP_FROM || user;
+
+  if (resolvedHost) {
+    return {
+      from,
+      transporter: nodemailer.createTransport({
+        host: resolvedHost,
+        port,
+        secure,
+        auth: {
+          user,
+          pass,
+        },
+      }),
+    };
+  }
+
+  return {
+    from,
+    transporter: nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user,
+        pass,
+      },
+    }),
+  };
+}
+
 function escapeHtml(value: string) {
   return value
     .replace(/&/g, "&amp;")
@@ -51,33 +102,7 @@ function escapeHtml(value: string) {
 
 export async function sendLiveChatNotificationEmail(params: LiveChatEmailParams) {
   if (!hasMailConfig()) return false;
-
-  const { default: nodemailer } = await import("nodemailer");
-
-  const host = process.env.NODEMAILER_HOST || process.env.SMTP_HOST;
-  const port = Number(process.env.NODEMAILER_PORT || process.env.SMTP_PORT || 587);
-  const user = process.env.NODEMAILER_USER || process.env.SMTP_USER;
-  const pass = process.env.NODEMAILER_PASS || process.env.SMTP_PASS;
-  const from = process.env.NODEMAILER_FROM || process.env.SMTP_FROM || user;
-  const secure = port === 465;
-
-  const transporter = host
-    ? nodemailer.createTransport({
-        host,
-        port,
-        secure,
-        auth: {
-          user,
-          pass,
-        },
-      })
-    : nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user,
-          pass,
-        },
-      });
+  const { from, transporter } = await createMailTransporter();
 
   const subject = `New visitor message - ${params.senderName}`;
   const safeName = escapeHtml(params.senderName || "Website Visitor");
@@ -154,33 +179,7 @@ export async function sendLiveChatNotificationEmail(params: LiveChatEmailParams)
 
 export async function sendVisitorReplyEmail(params: VisitorReplyEmailParams) {
   if (!hasMailConfig()) return false;
-
-  const { default: nodemailer } = await import("nodemailer");
-
-  const host = process.env.NODEMAILER_HOST || process.env.SMTP_HOST;
-  const port = Number(process.env.NODEMAILER_PORT || process.env.SMTP_PORT || 587);
-  const user = process.env.NODEMAILER_USER || process.env.SMTP_USER;
-  const pass = process.env.NODEMAILER_PASS || process.env.SMTP_PASS;
-  const from = process.env.NODEMAILER_FROM || process.env.SMTP_FROM || user;
-  const secure = port === 465;
-
-  const transporter = host
-    ? nodemailer.createTransport({
-        host,
-        port,
-        secure,
-        auth: {
-          user,
-          pass,
-        },
-      })
-    : nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user,
-          pass,
-        },
-      });
+  const { from, transporter } = await createMailTransporter();
 
   const mailSubject = params.subject?.trim()
     ? `Reply: ${params.subject.trim()}`
@@ -208,33 +207,7 @@ export async function sendVisitorReplyEmail(params: VisitorReplyEmailParams) {
 
 export async function sendSubscriberEmail(params: SubscriberEmailParams) {
   if (!hasMailConfig()) return false;
-
-  const { default: nodemailer } = await import("nodemailer");
-
-  const host = process.env.NODEMAILER_HOST || process.env.SMTP_HOST;
-  const port = Number(process.env.NODEMAILER_PORT || process.env.SMTP_PORT || 587);
-  const user = process.env.NODEMAILER_USER || process.env.SMTP_USER;
-  const pass = process.env.NODEMAILER_PASS || process.env.SMTP_PASS;
-  const from = process.env.NODEMAILER_FROM || process.env.SMTP_FROM || user;
-  const secure = port === 465;
-
-  const transporter = host
-    ? nodemailer.createTransport({
-        host,
-        port,
-        secure,
-        auth: {
-          user,
-          pass,
-        },
-      })
-    : nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user,
-          pass,
-        },
-      });
+  const { from, transporter } = await createMailTransporter();
 
   const safeMessage = escapeHtml(params.message || "");
   const safeSiteName = escapeHtml(SITE_NAME);
@@ -310,33 +283,7 @@ export async function sendSubscriberEmail(params: SubscriberEmailParams) {
 
 export async function sendContactFormEmail(params: ContactFormEmailParams) {
   if (!hasMailConfig()) return false;
-
-  const { default: nodemailer } = await import("nodemailer");
-
-  const host = process.env.NODEMAILER_HOST || process.env.SMTP_HOST;
-  const port = Number(process.env.NODEMAILER_PORT || process.env.SMTP_PORT || 587);
-  const user = process.env.NODEMAILER_USER || process.env.SMTP_USER;
-  const pass = process.env.NODEMAILER_PASS || process.env.SMTP_PASS;
-  const from = process.env.NODEMAILER_FROM || process.env.SMTP_FROM || user;
-  const secure = port === 465;
-
-  const transporter = host
-    ? nodemailer.createTransport({
-        host,
-        port,
-        secure,
-        auth: {
-          user,
-          pass,
-        },
-      })
-    : nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user,
-          pass,
-        },
-      });
+  const { from, transporter } = await createMailTransporter();
 
   const mailSubject = params.subject?.trim()
     ? `New contact form message - ${params.subject.trim()}`
