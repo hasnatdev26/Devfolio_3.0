@@ -221,9 +221,8 @@ export async function sendSubscriberEmail(params: SubscriberEmailParams) {
           .mail-card { border-radius: 14px !important; }
           .mail-header { padding: 18px !important; }
           .mail-header h2 { font-size: 24px !important; }
-          .mail-body { padding: 18px !important; }
+          .mail-body { padding: 22px 18px !important; }
           .mail-body p { font-size: 14px !important; }
-          .mail-message { padding: 12px !important; }
         }
         @media only screen and (max-width: 420px) {
           .mail-shell { padding: 8px !important; }
@@ -246,13 +245,11 @@ export async function sendSubscriberEmail(params: SubscriberEmailParams) {
                 </td>
               </tr>
               <tr>
-                <td class="mail-body" style="padding:28px;">
-                  <div style="padding:20px;border:1px solid #e9d5ff;border-radius:14px;background:#faf5ff;">
-                    <p style="margin:0;font-size:15px;line-height:1.75;color:#0f172a;white-space:pre-wrap;word-break:break-word;">${safeMessage}</p>
-                  </div>
-                  <div style="margin-top:26px;padding-top:18px;border-top:1px solid #e9d5ff;text-align:center;">
-                    <p style="margin:0;font-size:13px;line-height:1.6;color:#64748b;">Sent from ${safeSiteName}'s portfolio.</p>
-                    <p style="margin:5px 0 0;font-size:13px;line-height:1.6;">
+                <td class="mail-body" style="padding:34px 38px 28px;">
+                  <p style="margin:0;font-size:16px;line-height:1.85;color:#1e293b;white-space:pre-wrap;word-break:break-word;">${safeMessage}</p>
+                  <div style="margin-top:32px;padding:0;border-top:1px solid #e2e8f0;font-size:13px;line-height:1.65;color:#64748b;">
+                    <p style="margin:18px 0 0;">Sent from ${safeSiteName}'s portfolio.</p>
+                    <p style="margin:4px 0 0;">
                       <a href="${SITE_URL}" style="color:#6d28d9;font-weight:700;text-decoration:none;">${safeSiteDomain}</a>
                     </p>
                   </div>
@@ -306,44 +303,28 @@ export async function sendContactFormEmail(params: ContactFormEmailParams) {
   const safeMessage = escapeHtml(params.message || "");
   const html = `
     <div style="margin:0;padding:0;background:#f1f5f9;font-family:Arial,sans-serif;color:#0f172a;">
-      <style>
-        @media only screen and (max-width: 640px) {
-          .mail-shell { padding: 12px !important; }
-          .mail-card { border-radius: 12px !important; }
-          .mail-header { padding: 14px !important; }
-          .mail-header h2 { font-size: 19px !important; }
-          .mail-body { padding: 14px !important; }
-          .mail-table td { display: block !important; width: 100% !important; padding: 6px 0 !important; }
-          .mail-message { padding: 12px !important; }
-        }
-        @media only screen and (max-width: 420px) {
-          .mail-shell { padding: 8px !important; }
-          .mail-header h2 { font-size: 17px !important; }
-          .mail-body p, .mail-body td { font-size: 14px !important; }
-        }
-      </style>
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="mail-shell" style="padding:24px;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="mail-shell" style="padding:0;">
         <tr>
           <td align="center">
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="mail-card" style="max-width:680px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;">
         <tr>
-          <td class="mail-header" style="padding:18px 22px;background:linear-gradient(90deg,#a21caf,#7c3aed,#2563eb);color:#ffffff;">
+          <td class="mail-header" style="padding:0;background:linear-gradient(90deg,#a21caf,#7c3aed,#2563eb);color:#ffffff;">
             <p style="margin:0;font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.9;">Portfolio Contact</p>
             <h2 style="margin:6px 0 0;font-size:22px;line-height:1.3;">New Contact Form Message</h2>
           </td>
         </tr>
         <tr>
-          <td class="mail-body" style="padding:20px 22px;">
+          <td class="mail-body" style="padding:0;">
             <p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:#334155;">
               A new visitor submitted the contact form.
             </p>
             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="mail-table" style="border-collapse:collapse;">
-              <tr><td style="padding:8px 0;font-size:14px;color:#64748b;">Name</td><td style="padding:8px 0;font-size:15px;font-weight:600;color:#0f172a;word-break:break-word;">${safeName}</td></tr>
-              <tr><td style="padding:8px 0;font-size:14px;color:#64748b;">Email</td><td style="padding:8px 0;font-size:15px;font-weight:600;color:#0f172a;word-break:break-word;">${safeEmail}</td></tr>
-              <tr><td style="padding:8px 0;font-size:14px;color:#64748b;">Phone</td><td style="padding:8px 0;font-size:15px;font-weight:600;color:#0f172a;word-break:break-word;">${safePhone}</td></tr>
-              <tr><td style="padding:8px 0;font-size:14px;color:#64748b;">Subject</td><td style="padding:8px 0;font-size:15px;font-weight:600;color:#0f172a;word-break:break-word;">${safeSubject}</td></tr>
+              <tr><td style="padding:0;font-size:14px;color:#64748b;">Name</td><td style="padding:0;font-size:15px;font-weight:600;color:#0f172a;word-break:break-word;">${safeName}</td></tr>
+              <tr><td style="padding:0;font-size:14px;color:#64748b;">Email</td><td style="padding:0;font-size:15px;font-weight:600;color:#0f172a;word-break:break-word;">${safeEmail}</td></tr>
+              <tr><td style="padding:0;font-size:14px;color:#64748b;">Phone</td><td style="padding:0;font-size:15px;font-weight:600;color:#0f172a;word-break:break-word;">${safePhone}</td></tr>
+              <tr><td style="padding:0;font-size:14px;color:#64748b;">Subject</td><td style="padding:0;font-size:15px;font-weight:600;color:#0f172a;word-break:break-word;">${safeSubject}</td></tr>
             </table>
-            <div class="mail-message" style="margin-top:16px;padding:14px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc;">
+            <div class="mail-message" style="margin-top:16px;padding:0;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc;">
               <p style="margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#64748b;">Message</p>
               <p style="margin:0;font-size:15px;line-height:1.7;color:#0f172a;white-space:pre-wrap;word-break:break-word;">${safeMessage}</p>
             </div>
