@@ -1,7 +1,7 @@
 "use client";
 
 import { type FormEvent, useCallback, useEffect, useState } from "react";
-import { FaEnvelope, FaTrashAlt } from "react-icons/fa";
+import { FaEnvelope, FaEye, FaTrashAlt } from "react-icons/fa";
 
 type EmailSignup = {
   _id: string;
@@ -29,6 +29,7 @@ export default function DashboardEmailSignupsPage() {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
   const [composeForm, setComposeForm] = useState({
     recipientEmail: "",
     sendToAll: false,
@@ -197,6 +198,34 @@ export default function DashboardEmailSignupsPage() {
             required
           />
         </div>
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <p className="text-xs text-slate-500">Preview updates as you write. This is not sent until you press Send Email.</p>
+          <button type="button" onClick={() => setShowPreview((value) => !value)} className="inline-flex shrink-0 items-center gap-2 rounded-md border border-violet-300 bg-white px-3 py-2 text-xs font-semibold text-violet-700 transition hover:bg-violet-50" aria-expanded={showPreview}>
+            <FaEye aria-hidden="true" />{showPreview ? "Hide Preview" : "Show Preview"}
+          </button>
+        </div>
+        {showPreview ? (
+          <section className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 p-3 sm:p-5" aria-label="Email preview">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <p className="font-semibold uppercase tracking-[0.14em] text-slate-500">Email preview</p>
+              <p className="break-all text-slate-500">To: {composeForm.sendToAll ? `All subscribers (${emailSignups.length})` : composeForm.recipientEmail || "recipient@email.com"}</p>
+            </div>
+            <article className="mx-auto max-w-[680px] overflow-hidden rounded-[18px] border border-purple-200 bg-white shadow-sm">
+              <header className="bg-gradient-to-r from-fuchsia-500 via-purple-600 to-violet-700 px-5 py-5 text-left text-white sm:px-6">
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-fuchsia-100">Portfolio Message</p>
+                <h2 className="mt-2 text-xl font-extrabold sm:text-2xl">Hasnat Evan</h2>
+                <p className="mt-1 text-xs text-violet-100">Full Stack Web Developer</p>
+              </header>
+              <div className="px-5 py-6 text-left sm:px-7 sm:py-7">
+                <p className="whitespace-pre-wrap break-words text-[13px] leading-7 text-slate-800">{composeForm.message || "Your email message will appear here..."}</p>
+                <div className="mt-6 border-t border-slate-200 pt-3 text-[11px] leading-5 text-slate-500">
+                  <p>Sent from Hasnat Evan&apos;s portfolio.</p>
+                  <p className="mt-1 font-bold text-violet-700">hasnatevan.top</p>
+                </div>
+              </div>
+            </article>
+          </section>
+        ) : null}
         <button
           type="submit"
           disabled={sending}
